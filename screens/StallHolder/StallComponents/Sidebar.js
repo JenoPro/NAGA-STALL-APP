@@ -45,17 +45,6 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
     </View>
   );
 
-  const InboxIcon = () => (
-    <View style={styles.iconContainer}>
-      <View style={styles.inboxIcon}>
-        <View style={styles.inboxBody} />
-        <View style={styles.inboxFlap} />
-        <View style={styles.inboxLine1} />
-        <View style={styles.inboxLine2} />
-      </View>
-    </View>
-  );
-
   const menuItems = [
     { 
       id: 'dashboard', 
@@ -88,12 +77,6 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
       isImage: true
     },
     { 
-      id: 'inbox', 
-      title: 'Inbox', 
-      icon: require('../../../assets/Inbox-icon.png'),
-      isImage: true
-    },
-    { 
       id: 'notifications', 
       title: 'Notifications', 
       icon: require('../../../assets/Notifications-icon.png'),
@@ -121,7 +104,11 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
             { transform: [{ translateX: slideAnim }] }
           ]}
         >
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <ScrollView 
+            style={styles.content} 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1 }}
+          >
             {/* Header Gradient */}
             <View style={styles.headerGradient}>
               {/* Profile Section */}
@@ -188,30 +175,30 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
                 </TouchableOpacity>
               ))}
             </View>
-
-            {/* Bottom Section */}
-            <View style={styles.bottomSection}>
-              <View style={styles.divider} />
-              <TouchableOpacity 
-                style={styles.logoutItem}
-                onPress={() => onMenuItemPress('logout')}
-                activeOpacity={0.7}
-              >
-                <View style={styles.logoutIconContainer}>
-                  <View style={styles.logoutIcon}>
-                    <View style={styles.logoutArrow} />
-                    <View style={styles.logoutDoor} />
-                  </View>
-                </View>
-                <Text style={styles.logoutText}>Sign Out</Text>
-              </TouchableOpacity>
-              
-              {/* App Version */}
-              <View style={styles.versionContainer}>
-                <Text style={styles.versionText}>Version 1.2.0</Text>
-              </View>
-            </View>
           </ScrollView>
+
+          {/* Fixed Bottom Section */}
+          <View style={styles.bottomSection}>
+            <View style={styles.divider} />
+            <TouchableOpacity 
+              style={styles.logoutItem}
+              onPress={() => onMenuItemPress('logout')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.logoutIconContainer}>
+                <View style={styles.logoutIcon}>
+                  <View style={styles.logoutArrow} />
+                  <View style={styles.logoutDoor} />
+                </View>
+              </View>
+              <Text style={styles.logoutText}>Sign Out</Text>
+            </TouchableOpacity>
+            
+            {/* App Version */}
+            <View style={styles.versionContainer}>
+              <Text style={styles.versionText}>Version 1.2.0</Text>
+            </View>
+          </View>
         </Animated.View>
       </View>
     </Modal>

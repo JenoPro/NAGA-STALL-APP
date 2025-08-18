@@ -27,9 +27,11 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
+    flexDirection: 'column', // Added for proper flex layout
   },
   content: {
     flex: 1,
+    flexDirection: 'column', // Added for proper flex layout
   },
   headerGradient: {
     backgroundColor: '#f8fafc',
@@ -136,6 +138,7 @@ export const styles = StyleSheet.create({
   navigationSection: {
     paddingTop: 32,
     paddingHorizontal: 8,
+    flex: 1, // Added to take up available space
   },
   sectionTitle: {
     fontSize: 11,
@@ -192,8 +195,10 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomSection: {
-    marginTop: 'auto',
+    // Removed marginTop: 'auto' since it's now positioned at the bottom
+    paddingTop: 20, // Added some top padding
     paddingBottom: 32,
+    backgroundColor: '#ffffff', // Ensure background matches
   },
   divider: {
     height: 1,
@@ -259,52 +264,6 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     width: 4,
     height: 6,
-    backgroundColor: '#64748b',
-  },
-
-  // Inbox Icon
-  inboxIcon: {
-    width: 22,
-    height: 18,
-    position: 'relative',
-  },
-  inboxBody: {
-    width: 22,
-    height: 14,
-    borderWidth: 2,
-    borderColor: '#64748b',
-    borderTopWidth: 0,
-    borderRadius: 0,
-    borderBottomLeftRadius: 2,
-    borderBottomRightRadius: 2,
-  },
-  inboxFlap: {
-    position: 'absolute',
-    top: 0,
-    left: 2,
-    width: 18,
-    height: 9,
-    borderTopWidth: 2,
-    borderLeftWidth: 2,
-    borderRightWidth: 2,
-    borderColor: '#64748b',
-    borderTopLeftRadius: 2,
-    borderTopRightRadius: 2,
-  },
-  inboxLine1: {
-    position: 'absolute',
-    bottom: 7,
-    left: 5,
-    width: 12,
-    height: 1,
-    backgroundColor: '#64748b',
-  },
-  inboxLine2: {
-    position: 'absolute',
-    bottom: 4,
-    left: 5,
-    width: 8,
-    height: 1,
     backgroundColor: '#64748b',
   },
 

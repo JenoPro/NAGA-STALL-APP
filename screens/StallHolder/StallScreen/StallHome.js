@@ -18,7 +18,6 @@ import ReportsScreen from './Report/ReportsScreen';
 import RaffleScreen from './Raffle/RaffleScreen';
 import AuctionScreen from './Auction/AuctionScreen';
 import SettingsScreen from './Settings/SettingsScreen';
-import InboxScreen from './Inbox/InboxScreen';
 import NotificationsScreen from './Notifications/NotificationsScreen';
 import DocumentsScreen from './Documents/DocumentsScreen';
 import StallScreen from './Stall/StallScreen';
@@ -70,9 +69,6 @@ const StallHome = ({ navigation }) => {
       case 'settings':
         console.log('Settings selected');
         break;
-      case 'inbox':
-        console.log('Inbox selected');
-        break;
       case 'notifications':
         console.log('Notifications selected');
         break;
@@ -98,7 +94,6 @@ const StallHome = ({ navigation }) => {
       raffle: 'Raffle',
       auction: 'Auction',
       settings: 'Settings',
-      inbox: 'Inbox',
       notifications: 'Notifications',
     };
     return titles[currentPage] || 'Stall Management'; // Changed default from 'Dashboard' to 'Stall Management'
@@ -149,8 +144,6 @@ const StallHome = ({ navigation }) => {
           return <AuctionScreen />;
         case 'settings':
           return <SettingsScreen />;
-        case 'inbox':
-          return <InboxScreen />;
         case 'notifications':
           return <NotificationsScreen />;
         default:
