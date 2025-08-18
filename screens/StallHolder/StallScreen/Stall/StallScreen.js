@@ -19,6 +19,7 @@ const stallsData = [
     id: 1,
     stallNumber: '01',
     price: '1,500',
+    priceValue: 1500, // Added numerical value for sorting
     location: 'NCPM',
     floor: '2nd Floor / Grocery Section',
     size: '3x3 meters',
@@ -29,6 +30,7 @@ const stallsData = [
     id: 2,
     stallNumber: '50',
     price: '2,500',
+    priceValue: 2500,
     location: 'SATELLITE',
     floor: '2nd Floor / Grocery Section',
     size: '3x3 meters',
@@ -39,6 +41,7 @@ const stallsData = [
     id: 3,
     stallNumber: '30',
     price: '2,500',
+    priceValue: 2500,
     location: 'NCPM',
     floor: '2nd Floor / Grocery Section',
     size: '3x3 meters',
@@ -49,6 +52,7 @@ const stallsData = [
     id: 4,
     stallNumber: '32',
     price: '2,500',
+    priceValue: 2500,
     location: 'SATELLITE',
     floor: 'Ground Floor / Main Section',
     size: '3x3 meters',
@@ -59,6 +63,7 @@ const stallsData = [
     id: 5,
     stallNumber: '15',
     price: '1,800',
+    priceValue: 1800,
     location: 'NCPM',
     floor: 'Ground Floor / Electronics Section',
     size: '4x3 meters',
@@ -69,15 +74,18 @@ const stallsData = [
 
 const StallScreen = () => {
   const [selectedFilter, setSelectedFilter] = useState('ALL');
+  const [selectedSort, setSelectedSort] = useState('default');
   const [searchText, setSearchText] = useState('');
 
-  const getFilteredStalls = () => {
+  const getFilteredAndSortedStalls = () => {
     let filtered = stallsData;
     
+    // Apply category filter
     if (selectedFilter !== 'ALL') {
       filtered = filtered.filter(stall => stall.location === selectedFilter);
     }
     
+    // Apply search filter
     if (searchText) {
       filtered = filtered.filter(stall => 
         stall.stallNumber.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -85,6 +93,14 @@ const StallScreen = () => {
         stall.location.toLowerCase().includes(searchText.toLowerCase())
       );
     }
+    
+    // Apply price sorting
+    if (selectedSort === 'price_asc') {
+      filtered = [...filtered].sort((a, b) => a.priceValue - b.priceValue);
+    } else if (selectedSort === 'price_desc') {
+      filtered = [...filtered].sort((a, b) => b.priceValue - a.priceValue);
+    }
+    // For 'default', keep original order
     
     return filtered;
   };
@@ -102,11 +118,13 @@ const StallScreen = () => {
         <FilterButtons 
           selectedFilter={selectedFilter}
           onFilterSelect={setSelectedFilter}
+          selectedSort={selectedSort}
+          onSortSelect={setSelectedSort}
         />
 
         {/* Stall Cards */}
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          {getFilteredStalls().map((stall) => (
+          {getFilteredAndSortedStalls().map((stall) => (
             <StallCard key={stall.id} stall={stall} />
           ))}
         </ScrollView>
