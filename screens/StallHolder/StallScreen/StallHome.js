@@ -25,16 +25,15 @@ import StallScreen from './Stall/StallScreen';
 const { width, height } = Dimensions.get('window');
 
 const StallHome = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState('Stall'); // Default to Stall tab
+  // Single source of truth for current screen
+  const [currentScreen, setCurrentScreen] = useState('stall');
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState('stall'); // Changed from 'dashboard' to 'stall'
 
   const handleLogout = () => {
     navigation.navigate('LoginScreen');
   };
 
   const handleMenuPress = () => {
-    console.log('Menu pressed - opening sidebar');
     setSidebarVisible(true);
   };
 
@@ -46,47 +45,27 @@ const StallHome = ({ navigation }) => {
     console.log('Profile pressed - show account options');
   };
 
+  // Handle navigation from sidebar
   const handleMenuItemPress = (itemId) => {
-    setCurrentPage(itemId);
-    setSidebarVisible(false);
+    console.log(`Navigating to: ${itemId}`);
     
-    switch (itemId) {
-      case 'dashboard':
-        console.log('Dashboard selected');
-        break;
-      case 'stall':
-        console.log('Stall selected');
-        break;
-      case 'reports':
-        console.log('Reports selected');
-        break;
-      case 'raffle':
-        console.log('Raffle selected');
-        break;
-      case 'auction':
-        console.log('Auction selected');
-        break;
-      case 'settings':
-        console.log('Settings selected');
-        break;
-      case 'notifications':
-        console.log('Notifications selected');
-        break;
-      case 'logout':
-        console.log('Logout selected');
-        handleLogout();
-        break;
-      default:
-        console.log('Unknown menu item:', itemId);
+    if (itemId === 'logout') {
+      handleLogout();
+      return;
     }
+    
+    setCurrentScreen(itemId);
+    setSidebarVisible(false);
+  };
+
+  // Handle navigation from bottom navbar
+  const handleNavigation = (screen) => {
+    console.log(`Bottom nav - Navigating to: ${screen}`);
+    setCurrentScreen(screen);
   };
 
   // Get page title for header
   const getPageTitle = () => {
-    if (activeTab === 'Documents') {
-      return 'Documents';
-    }
-    
     const titles = {
       dashboard: 'Dashboard',
       stall: 'Stall Management',
@@ -95,64 +74,47 @@ const StallHome = ({ navigation }) => {
       auction: 'Auction',
       settings: 'Settings',
       notifications: 'Notifications',
+      documents: 'Documents',
     };
-    return titles[currentPage] || 'Stall Management'; // Changed default from 'Dashboard' to 'Stall Management'
+    return titles[currentScreen] || 'Stall Management';
   };
 
-  // Navbar handlers
-  const handleLive = () => {
-    console.log('Live pressed');
-    setActiveTab('Live');
-    // You can add navigation to Live screen if needed
+  // Determine which tab should be active in navbar
+  const getActiveNavTab = () => {
+    // Only show active state for screens that are actually in the navbar
+    if (currentScreen === 'documents') {
+      return 'Documents';
+    }
+    if (currentScreen === 'stall') {
+      return 'Stall';
+    }
+    // For sidebar screens (dashboard, reports, raffle, auction, settings, notifications)
+    // return null to show no active state in navbar
+    return null;
   };
 
-  const handleStall = () => {
-    console.log('Stall pressed');
-    setActiveTab('Stall');
-    setCurrentPage('stall'); // Changed from 'dashboard' to 'stall'
-  };
-
-  const handleDocuments = () => {
-    console.log('Documents pressed');
-    setActiveTab('Documents');
-  };
-
-  const handleLogoutFromNav = () => {
-    console.log('Logout pressed');
-    setActiveTab('Logout');
-    handleLogout();
-  };
-
-  // Render current screen based on activeTab and currentPage
+  // Render current screen
   const renderCurrentScreen = () => {
-    if (activeTab === 'Documents') {
-      return <DocumentsScreen />;
+    switch (currentScreen) {
+      case 'dashboard':
+        return <DashboardScreen />;
+      case 'stall':
+        return <StallScreen />;
+      case 'reports':
+        return <ReportsScreen />;
+      case 'raffle':
+        return <RaffleScreen />;
+      case 'auction':
+        return <AuctionScreen />;
+      case 'settings':
+        return <SettingsScreen />;
+      case 'notifications':
+        return <NotificationsScreen />;
+      case 'documents':
+        return <DocumentsScreen />;
+      default:
+        return <StallScreen />;
     }
-    
-    if (activeTab === 'Stall') {
-      // For Stall tab, render based on currentPage from sidebar
-      switch (currentPage) {
-        case 'dashboard':
-          return <DashboardScreen />; // Dashboard has its own screen
-        case 'stall':
-          return <StallScreen />; // Stall has its own screen  
-        case 'reports':
-          return <ReportsScreen />;
-        case 'raffle':
-          return <RaffleScreen />;
-        case 'auction':
-          return <AuctionScreen />;
-        case 'settings':
-          return <SettingsScreen />;
-        case 'notifications':
-          return <NotificationsScreen />;
-        default:
-          return <StallScreen />; // Changed default from DashboardScreen to StallScreen
-      }
-    }
-
-    // Default fallback
-    return <StallScreen />; // Changed default from DashboardScreen to StallScreen
   };
 
   return (
@@ -176,11 +138,9 @@ const StallHome = ({ navigation }) => {
 
         {/* Bottom Navigation Component */}
         <Navbar 
-          activeTab={activeTab}
-          onLivePress={handleLive}
-          onStallPress={handleStall}
-          onDocumentsPress={handleDocuments}
-          onLogoutPress={handleLogoutFromNav}
+          activeTab={getActiveNavTab()}
+          onStallPress={() => handleNavigation('stall')}
+          onDocumentsPress={() => handleNavigation('documents')}
         />
 
         {/* Sidebar Component */}
@@ -189,7 +149,7 @@ const StallHome = ({ navigation }) => {
           onClose={handleSidebarClose}
           onProfilePress={handleProfilePress}
           onMenuItemPress={handleMenuItemPress}
-          activeMenuItem={currentPage}
+          activeMenuItem={currentScreen}
         />
       </SafeAreaView>
     </SafeAreaProvider>
