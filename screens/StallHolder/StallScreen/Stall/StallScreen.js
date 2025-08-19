@@ -7,8 +7,7 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 // Import components
-import SearchBar from './components/SearchBar';
-import FilterButtons from './components/FilterButtons';
+import SearchFilterBar from './components/SearchFilterBar'; // Updated import
 import StallCard from './components/StallCard';
 
 const { width } = Dimensions.get('window');
@@ -108,14 +107,10 @@ const StallScreen = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        {/* Search Bar Component */}
-        <SearchBar 
+        {/* Combined Search and Filter Bar */}
+        <SearchFilterBar 
           searchText={searchText}
           onSearchChange={setSearchText}
-        />
-
-        {/* Filter Buttons Component */}
-        <FilterButtons 
           selectedFilter={selectedFilter}
           onFilterSelect={setSelectedFilter}
           selectedSort={selectedSort}
