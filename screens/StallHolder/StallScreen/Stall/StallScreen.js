@@ -7,7 +7,7 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 // Import components
-import SearchFilterBar from './components/SearchFilterBar'; // Updated import
+import SearchFilterBar from './components/SearchFilter/SearchFilterBar'; // Updated import
 import StallCard from './components/StallCard';
 
 const { width } = Dimensions.get('window');

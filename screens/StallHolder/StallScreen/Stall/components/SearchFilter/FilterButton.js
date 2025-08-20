@@ -1,34 +1,30 @@
 import React, { useState } from 'react';
 import { 
-  View, 
-  Text, 
-  TextInput, 
   TouchableOpacity, 
-  StyleSheet, 
-  Dimensions, 
+  Text, 
+  View, 
   Modal, 
-  FlatList 
+  FlatList, 
+  StyleSheet, 
+  Dimensions 
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const { width } = Dimensions.get('window');
 
-const SearchFilterBar = ({ 
-  searchText, 
-  onSearchChange, 
+const FilterButton = ({ 
   selectedFilter, 
   onFilterSelect, 
   selectedSort, 
-  onSortSelect 
-}) => {
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
-  
-  const filters = ['ALL', 'NCPM', 'SATELLITE'];
-  const sortOptions = [
+  onSortSelect,
+  filters = ['ALL', 'NCPM', 'SATELLITE'],
+  sortOptions = [
     { label: 'Price: Low to High', value: 'price_asc' },
     { label: 'Price: High to Low', value: 'price_desc' },
     { label: 'Default', value: 'default' }
-  ];
+  ]
+}) => {
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
 
   const toggleFilterDropdown = () => {
     setIsFilterVisible(!isFilterVisible);
@@ -97,41 +93,27 @@ const SearchFilterBar = ({
 
   return (
     <>
-      <View style={styles.container}>
-        {/* Search Input */}
-        <View style={styles.searchContainer}>
-          <Icon name="search" size={20} color="#9CA3AF" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search stalls, location, or floor..."
-            value={searchText}
-            onChangeText={onSearchChange}
-            placeholderTextColor="#9CA3AF"
-          />
-        </View>
-        
-        {/* Filter Button */}
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            hasActiveFilters && styles.filterButtonActive
-          ]}
-          onPress={toggleFilterDropdown}
-        >
-          <Icon 
-            name="filter-list" 
-            size={20} 
-            color={hasActiveFilters ? "#002181" : "#6b7280"} 
-          />
-          {hasActiveFilters && (
-            <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeDot}>
-                {(selectedFilter !== 'ALL' ? 1 : 0) + (selectedSort !== 'default' ? 1 : 0)}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
+      {/* Filter Button */}
+      <TouchableOpacity
+        style={[
+          styles.filterButton,
+          hasActiveFilters && styles.filterButtonActive
+        ]}
+        onPress={toggleFilterDropdown}
+      >
+        <Icon 
+          name="filter-list" 
+          size={20} 
+          color={hasActiveFilters ? "#002181" : "#6b7280"} 
+        />
+        {hasActiveFilters && (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeDot}>
+              {(selectedFilter !== 'ALL' ? 1 : 0) + (selectedSort !== 'default' ? 1 : 0)}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
 
       {/* Filter Modal */}
       <Modal
@@ -172,33 +154,6 @@ const SearchFilterBar = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    paddingHorizontal: width * 0.04,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    alignItems: 'center',
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f9fafb',
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    marginRight: 12,
-    height: 45,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#374151',
-  },
   filterButton: {
     backgroundColor: '#ffffffff',
     borderRadius: 25,
@@ -320,4 +275,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchFilterBar;
+export default FilterButton;

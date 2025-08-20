@@ -8,7 +8,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import RaffleCard from './Components/RaffleCard';
-import SearchFilterBar from './Components/SearchFilterBar';
+import SearchFilterBar from './Components/SearchFilter/SearchFilterBar';
 
 const { width } = Dimensions.get('window');
 
@@ -62,6 +62,16 @@ const RaffleScreen = () => {
       category: 'clothing',
       floor: 'floor1'
     },
+    {
+      id: 5,
+      stall: '8',
+      location: '1st Floor / Food Court\n2x3 meters',
+      image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400',
+      isLive: false,
+      endTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
+      category: 'food',
+      floor: 'floor1'
+    },
   ];
 
   useEffect(() => {
@@ -93,6 +103,7 @@ const RaffleScreen = () => {
   const filterRaffles = () => {
     let filtered = [...raffles];
 
+    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(raffle => 
@@ -101,6 +112,7 @@ const RaffleScreen = () => {
       );
     }
 
+    // Apply status filters
     if (selectedFilters.length > 0) {
       filtered = filtered.filter(raffle => {
         const now = new Date().getTime();
@@ -108,22 +120,15 @@ const RaffleScreen = () => {
         
         return selectedFilters.some(filter => {
           switch (filter) {
-            case 'live':
+            case 'ongoing':
+              // Raffle is live and hasn't ended yet
               return raffle.isLive && endTime > now;
-            case 'upcoming':
+            case 'countdown':
+              // Raffle is not live yet but will start (upcoming raffles)
               return !raffle.isLive && endTime > now;
             case 'expired':
+              // Raffle has ended
               return endTime < now;
-            case 'floor1':
-              return raffle.floor === 'floor1';
-            case 'floor2':
-              return raffle.floor === 'floor2';
-            case 'grocery':
-              return raffle.category === 'grocery';
-            case 'electronics':
-              return raffle.category === 'electronics';
-            case 'clothing':
-              return raffle.category === 'clothing';
             default:
               return false;
           }
@@ -136,6 +141,8 @@ const RaffleScreen = () => {
 
   const handleRafflePress = (raffle) => {
     console.log('Pressed raffle:', raffle.stall);
+    // Navigate to raffle details screen
+    // navigation.navigate('RaffleDetails', { raffleId: raffle.id });
   };
 
   const renderRaffleCard = ({ item }) => (
@@ -149,25 +156,34 @@ const RaffleScreen = () => {
     />
   );
 
-  const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <Text style={styles.emptyStateTitle}>No raffles found</Text>
-      <Text style={styles.emptyStateText}>
-        {searchQuery || selectedFilters.length > 0 
-          ? 'Try adjusting your search or filters'
-          : 'Check back later for new raffles'
-        }
-      </Text>
-    </View>
-  );
+  const renderEmptyState = () => {
+    const hasFilters = searchQuery || selectedFilters.length > 0;
+    
+    return (
+      <View style={styles.emptyState}>
+        <Text style={styles.emptyStateTitle}>
+          {hasFilters ? 'No raffles found' : 'No raffles available'}
+        </Text>
+        <Text style={styles.emptyStateText}>
+          {hasFilters 
+            ? 'Try adjusting your search or filters to find more results'
+            : 'Check back later for new raffles to join'
+          }
+        </Text>
+      </View>
+    );
+  };
 
+  // Fixed: Create header component to avoid virtualized list nesting
   const renderHeader = () => (
-    <SearchFilterBar
-      onSearch={setSearchQuery}
-      onFilter={setSelectedFilters}
-      searchValue={searchQuery}
-      selectedFilters={selectedFilters}
-    />
+    <View>
+      <SearchFilterBar
+        onSearch={setSearchQuery}
+        onFilter={setSelectedFilters}
+        searchValue={searchQuery}
+        selectedFilters={selectedFilters}
+      />
+    </View>
   );
 
   if (loading) {
@@ -196,7 +212,12 @@ const RaffleScreen = () => {
         }
         ListEmptyComponent={renderEmptyState}
         ListHeaderComponent={renderHeader}
+        ListHeaderComponentStyle={styles.headerStyle}
         stickyHeaderIndices={[0]} // Make the search bar sticky
+        removeClippedSubviews={false} // Fix for virtualized list issues
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={10}
       />
     </View>
   );
@@ -205,41 +226,46 @@ const RaffleScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#f8fafc',
   },
   listContent: {
-    paddingBottom: 16,
+    paddingBottom: 20,
     flexGrow: 1,
+  },
+  headerStyle: {
+    marginBottom: 0,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#f8fafc',
   },
   loadingText: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#64748b',
+    fontWeight: '500',
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: width * 0.1,
-    paddingVertical: 50,
+    paddingVertical: 60,
   },
   emptyStateTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '700',
+    color: '#0f172a',
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#64748b',
     textAlign: 'center',
     lineHeight: 24,
+    fontWeight: '400',
   },
 });
 
