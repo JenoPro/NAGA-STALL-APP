@@ -6,34 +6,38 @@ import StallHome from './screens/StallHolder/StallScreen/StallHome';
 import VendorHome from './screens/Vendor/VendorHome';
 import InspectorHome from './screens/Inspector/InspectorHome';
 
+import { ThemeProvider } from './screens/StallHolder/StallScreen/Settings/components/ThemeContext';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="LoginScreen"
-        screenOptions={{
-          headerShown: false, // Hide the default header
-        }}
-      >
-        <Stack.Screen 
-          name="LoginScreen" 
-          component={LoginScreen} 
-        />
-        <Stack.Screen 
-          name="StallHome" 
-          component={StallHome} 
-        />
-        <Stack.Screen 
-          name="VendorHome" 
-          component={VendorHome} 
-        />
-        <Stack.Screen 
-          name="InspectorHome" 
-          component={InspectorHome} 
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider>
+      <NavigationContainer>
+        <Stack.Navigator 
+          initialRouteName="LoginScreen"
+          screenOptions={{
+            headerShown: false, // Hide the default header
+          }}
+        >
+          <Stack.Screen 
+            name="LoginScreen" 
+            component={LoginScreen} 
+          />
+          <Stack.Screen 
+            name="StallHome" 
+            component={StallHome} 
+          />
+          <Stack.Screen 
+            name="VendorHome" 
+            component={VendorHome} 
+          />
+          <Stack.Screen 
+            name="InspectorHome" 
+            component={InspectorHome} 
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }

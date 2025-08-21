@@ -13,7 +13,7 @@ const SearchFilterBar = ({
   selectedSort, 
   onSortSelect,
   searchPlaceholder = "Search stalls, location, or floor...",
-  filters = ['ALL', 'NCPM', 'SATELLITE'],
+  filters = ['ALL', 'NCPM', 'SATELLITE MARKET'],
   sortOptions = [
     { label: 'Price: Low to High', value: 'price_asc' },
     { label: 'Price: High to Low', value: 'price_desc' },
