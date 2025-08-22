@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { mockUser } from "./mockUser";
+// import { useTheme } from "../ThemeContext"; babalikan kita soon, darkmode.
 
 const { width, height } = Dimensions.get("window");
 
@@ -130,7 +131,7 @@ const ProfileDisplay = ({ user, onGoBack }) => {
         />
       </InfoSection>
 
-      <InfoSection title="Documents">
+      <InfoSection title="Other Information">
         <InfoRow label="Signature" value="✓ Uploaded" />
         <InfoRow label="House Sketch" value="✓ Uploaded" />
         <InfoRow label="Valid ID" value="✓ Uploaded" />

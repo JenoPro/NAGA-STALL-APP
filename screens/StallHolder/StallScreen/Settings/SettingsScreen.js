@@ -9,16 +9,18 @@ import {
   StatusBar,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import ProfileDisplay from "../Settings/components/ProfileDisplay";
-import { mockUser } from "../Settings/components/mockUser";
-import ThemeModal from "../Settings/components/ThemeModal";
-import { useTheme } from "../Settings/components/ThemeContext";
+import ProfileDisplay from "./components/ProfileComponents/ProfileDisplay";
+import { mockUser } from "./components/ProfileComponents/mockUser";
+import ThemeModal from "../Settings/components/ThemeComponents/ThemeModal";
+import { useTheme } from "../Settings/components/ThemeComponents/ThemeContext";
+import AboutApp from "../Settings/components/AboutApp";
 
 const { width } = Dimensions.get("window");
 
 const SettingsScreen = ({ user }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
+  const [showAbout, setShowAbout] = useState(false); // Add this state
   const { theme, themeMode, changeTheme } = useTheme();
 
   // use mockUser if no real user data is provided
@@ -65,6 +67,17 @@ const SettingsScreen = ({ user }) => {
     setShowThemeModal(false);
   };
 
+  // Add these new handler functions
+  const handleAboutPress = () => {
+    console.log("About button pressed");
+    setShowAbout(true);
+  };
+
+  const handleAboutGoBack = () => {
+    console.log("About go back pressed");
+    setShowAbout(false);
+  };
+
   // get theme name for display
   const getThemeDisplayName = () => {
     switch (themeMode) {
@@ -84,6 +97,11 @@ const SettingsScreen = ({ user }) => {
 
   if (showProfile) {
     return <ProfileDisplay user={testUser} onGoBack={handleGoBack} />;
+  }
+
+  // Add this conditional rendering for About screen
+  if (showAbout) {
+    return <AboutApp onGoBack={handleAboutGoBack} />;
   }
 
   return (
@@ -176,7 +194,11 @@ const SettingsScreen = ({ user }) => {
         <View style={themedStyles.section}>
           <Text style={themedStyles.sectionTitle}>App Information</Text>
 
-          <TouchableOpacity style={themedStyles.settingsRow}>
+          {/* Updated About TouchableOpacity with onPress handler */}
+          <TouchableOpacity 
+            style={themedStyles.settingsRow}
+            onPress={handleAboutPress}
+          >
             <Ionicons
               name="information-circle-outline"
               size={24}

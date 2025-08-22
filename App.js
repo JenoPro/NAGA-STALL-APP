@@ -6,7 +6,7 @@ import StallHome from './screens/StallHolder/StallScreen/StallHome';
 import VendorHome from './screens/Vendor/VendorHome';
 import InspectorHome from './screens/Inspector/InspectorHome';
 
-import { ThemeProvider } from './screens/StallHolder/StallScreen/Settings/components/ThemeContext';
+import { ThemeProvider } from './screens/StallHolder/StallScreen/Settings/components/ThemeComponents/ThemeContext';
 
 const Stack = createNativeStackNavigator();
 
