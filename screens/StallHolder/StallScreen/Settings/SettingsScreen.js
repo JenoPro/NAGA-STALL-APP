@@ -9,18 +9,18 @@ import {
   StatusBar,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import ProfileDisplay from "./components/ProfileComponents/ProfileDisplay";
+import ProfileDisplay from "./components/ProfileComponents//ProfileComponents/ProfileDisplay";
 import { mockUser } from "./components/ProfileComponents/mockUser";
 import ThemeModal from "../Settings/components/ThemeComponents/ThemeModal";
 import { useTheme } from "../Settings/components/ThemeComponents/ThemeContext";
-import AboutApp from "../Settings/components/AboutApp";
+import AboutApp from "../Settings/components/AboutComponents/AboutApp";
 
 const { width } = Dimensions.get("window");
 
 const SettingsScreen = ({ user }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
-  const [showAbout, setShowAbout] = useState(false); // Add this state
+  const [showAbout, setShowAbout] = useState(false);
   const { theme, themeMode, changeTheme } = useTheme();
 
   // use mockUser if no real user data is provided

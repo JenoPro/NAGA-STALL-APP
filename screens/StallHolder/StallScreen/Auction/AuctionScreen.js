@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { ScrollView, StyleSheet, Dimensions, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-import AuctionCard from "../Auction/Components/AuctionCard";
+import AuctionCard from "./Components/AuctionCardComponents/AuctionCard";
 import SearchFilterBar from "../Stall/components/SearchFilter/SearchFilterBar";
 
 const { width } = Dimensions.get("window");
