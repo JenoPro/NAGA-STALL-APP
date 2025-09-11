@@ -1,0 +1,194 @@
+import { StyleSheet, } from "react-native";
+
+export const AuctionCardStyles = StyleSheet.create({
+ auctionCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "#1E9C00",
+  },
+  cardHeader: {
+    position: "relative",
+  },
+  stallImage: {
+    width: "100%",
+    height: 180,
+    backgroundColor: "#F3F4F6",
+  },
+  heartIcon: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    backgroundColor: "#FFFFFF",
+    width: 35,
+    height: 35,
+    borderRadius: 17.5,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  heartText: {
+    fontSize: 16,
+    color: "#EF4444",
+  },
+  auctionBadge: {
+    position: "absolute",
+    top: 15,
+    left: 15,
+    backgroundColor: "#1E9C00",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  auctionBadgeText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+  },
+  cardContent: {
+    padding: 20,
+  },
+  stallInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  stallNumberContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  stallLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#6B7280",
+    marginRight: 4,
+  },
+  stallNumber: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#1F2937",
+  },
+  locationContainer: {
+    backgroundColor: "#002181",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
+  locationText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  startingPriceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    backgroundColor: "#e6f8ea",
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#1E9C00",
+  },
+  startingPriceLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1E9C00",
+  },
+  startingPriceText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1E9C00",
+  },
+  detailsContainer: {
+    marginBottom: 15,
+  },
+  floorText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1F2937",
+    marginBottom: 2,
+  },
+  sizeText: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  stallDescriptionContainer: {
+    backgroundColor: "#F0F9FF",
+    padding: 10,
+    borderRadius: 7,
+    marginBottom: 15,
+  },
+  descriptionText: {
+    fontSize: 14,
+  },
+  stallDescriptionLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#002181",
+  },
+  auctionDateContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#F0F9FF",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: "#0284C7",
+  },
+  auctionDateLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#0C4A6E",
+  },
+  auctionDateText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#0369A1",
+  },
+  statusButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  statusButtonText: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  preRegisterButton: {
+    backgroundColor: "#0284C7",
+  },
+  preRegisterButtonText: {
+    color: "#FFFFFF",
+  },
+  disabledButton: {
+  backgroundColor: "#ccc",
+  opacity: 0.7,
+},
+
+});

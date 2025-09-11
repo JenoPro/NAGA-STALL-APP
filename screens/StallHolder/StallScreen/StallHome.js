@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,31 +6,32 @@ import {
   StatusBar,
   StyleSheet,
   Dimensions,
-} from 'react-native';
+} from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import Header from '../StallComponents/header';
-import Navbar from '../StallComponents/navbar';
-import Sidebar from '../StallComponents/Sidebar';
+import Header from "../StallComponents/header";
+import Navbar from "../StallComponents/navbar";
+import Sidebar from "../StallComponents/Sidebar";
 
 // Import all screen components
-import DashboardScreen from './Dashboard/DashboardScreen';
-import ReportsScreen from './Report/ReportsScreen';
-import RaffleScreen from './Raffle/RaffleScreen';
-import AuctionScreen from './Auction/AuctionScreen';
-import SettingsScreen from './Settings/SettingsScreen';
-import NotificationsScreen from './Notifications/NotificationsScreen';
-import DocumentsScreen from './Documents/DocumentsScreen';
-import StallScreen from './Stall/StallScreen';
+import DashboardScreen from "./Dashboard/DashboardScreen";
+import ReportsScreen from "./Report/ReportsScreen";
+import RaffleScreen from "./Raffle/RaffleScreen";
+import AuctionScreen from "./Auction/AuctionScreen";
+import SettingsScreen from "./Settings/SettingsScreen";
+import NotificationsScreen from "./Notifications/NotificationsScreen";
+import DocumentsScreen from "./Documents/DocumentsScreen";
+import StallScreen from "./Stall/StallScreen";
+import PaymentScreen from "./Payment/PaymentScreen";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const StallHome = ({ navigation }) => {
   // Single source of truth for current screen
-  const [currentScreen, setCurrentScreen] = useState('stall');
+  const [currentScreen, setCurrentScreen] = useState("stall");
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const handleLogout = () => {
-    navigation.navigate('LoginScreen');
+    navigation.navigate("LoginScreen");
   };
 
   const handleMenuPress = () => {
@@ -42,18 +43,18 @@ const StallHome = ({ navigation }) => {
   };
 
   const handleProfilePress = () => {
-    console.log('Profile pressed - show account options');
+    console.log("Profile pressed - show account options");
   };
 
   // Handle navigation from sidebar
   const handleMenuItemPress = (itemId) => {
     console.log(`Navigating to: ${itemId}`);
-    
-    if (itemId === 'logout') {
+
+    if (itemId === "logout") {
       handleLogout();
       return;
     }
-    
+
     setCurrentScreen(itemId);
     setSidebarVisible(false);
   };
@@ -67,26 +68,27 @@ const StallHome = ({ navigation }) => {
   // Get page title for header
   const getPageTitle = () => {
     const titles = {
-      dashboard: 'Dashboard',
-      stall: 'Stall Management',
-      reports: 'Reports',
-      raffle: 'Raffle',
-      auction: 'Auction',
-      settings: 'Settings',
-      notifications: 'Notifications',
-      documents: 'Documents',
+      dashboard: "Dashboard",
+      stall: "Stall Management",
+      reports: "Reports",
+      raffle: "Raffle",
+      auction: "Auction",
+      settings: "Settings",
+      notifications: "Notifications",
+      documents: "Documents",
+      payment: "Payment",
     };
-    return titles[currentScreen] || 'Stall Management';
+    return titles[currentScreen] || "Stall Management";
   };
 
   // Determine which tab should be active in navbar
   const getActiveNavTab = () => {
     // Only show active state for screens that are actually in the navbar
-    if (currentScreen === 'documents') {
-      return 'Documents';
+    if (currentScreen === "documents") {
+      return "Documents";
     }
-    if (currentScreen === 'stall') {
-      return 'Stall';
+    if (currentScreen === "stall") {
+      return "Stall";
     }
     // For sidebar screens (dashboard, reports, raffle, auction, settings, notifications)
     // return null to show no active state in navbar
@@ -96,22 +98,24 @@ const StallHome = ({ navigation }) => {
   // Render current screen
   const renderCurrentScreen = () => {
     switch (currentScreen) {
-      case 'dashboard':
+      case "dashboard":
         return <DashboardScreen />;
-      case 'stall':
+      case "stall":
         return <StallScreen />;
-      case 'reports':
+      case "reports":
         return <ReportsScreen />;
-      case 'raffle':
+      case "raffle":
         return <RaffleScreen />;
-      case 'auction':
+      case "auction":
         return <AuctionScreen />;
-      case 'settings':
+      case "settings":
         return <SettingsScreen />;
-      case 'notifications':
+      case "notifications":
         return <NotificationsScreen />;
-      case 'documents':
+      case "documents":
         return <DocumentsScreen />;
+      case "payment":
+        return <PaymentScreen />;
       default:
         return <StallScreen />;
     }
@@ -119,16 +123,17 @@ const StallHome = ({ navigation }) => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" translucent={false} />
-        
-        <Header 
-          onMenuPress={handleMenuPress}
-          title={getPageTitle()}
+      <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor="#ffffff"
+          translucent={false}
         />
 
+        <Header onMenuPress={handleMenuPress} title={getPageTitle()} />
+
         {/* Main Content */}
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -137,10 +142,10 @@ const StallHome = ({ navigation }) => {
         </ScrollView>
 
         {/* Bottom Navigation Component */}
-        <Navbar 
+        <Navbar
           activeTab={getActiveNavTab()}
-          onStallPress={() => handleNavigation('stall')}
-          onDocumentsPress={() => handleNavigation('documents')}
+          onStallPress={() => handleNavigation("stall")}
+          onDocumentsPress={() => handleNavigation("documents")}
         />
 
         {/* Sidebar Component */}
@@ -159,7 +164,7 @@ const StallHome = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: "#f8fafc",
   },
   scrollView: {
     flex: 1,

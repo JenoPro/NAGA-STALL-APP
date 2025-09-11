@@ -17,10 +17,11 @@ const FilterButton = ({
   onFilterSelect, 
   selectedSort, 
   onSortSelect,
-  filters = ['ALL', 'NCPM', 'SATELLITE MARKET'],
+  filters = ['ALL', 'ORDER', 'SYSTEM', 'PROMOTION', 'ANNOUNCEMENT'],
   sortOptions = [
-    { label: 'Price: Low to High', value: 'price_asc' },
-    { label: 'Price: High to Low', value: 'price_desc' },
+    { label: 'Newest First', value: 'newest' },
+    { label: 'Oldest First', value: 'oldest' },
+    { label: 'Unread First', value: 'unread' },
     { label: 'Default', value: 'default' }
   ]
 }) => {
@@ -81,7 +82,7 @@ const FilterButton = ({
     },
     {
       id: 'sort',
-      title: 'Sort by Price',
+      title: 'Sort by',
       options: sortOptions.map(option => ({
         key: option.value,
         label: option.label,
@@ -138,14 +139,14 @@ const FilterButton = ({
               </TouchableOpacity>
             </View>
             
-            <FlatList
-              data={filterSections}
-              keyExtractor={(item) => item.id}
-              renderItem={renderFilterSection}
-              ItemSeparatorComponent={() => <View style={styles.divider} />}
-              showsVerticalScrollIndicator={false}
-              style={styles.filterList}
-            />
+            <View style={styles.filterList}>
+              {filterSections.map((section, index) => (
+                <View key={section.id}>
+                  {renderFilterSection({ item: section })}
+                  {index < filterSections.length - 1 && <View style={styles.divider} />}
+                </View>
+              ))}
+            </View>
           </View>
         </TouchableOpacity>
       </Modal>
@@ -234,6 +235,7 @@ const styles = StyleSheet.create({
   filterList: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    maxHeight: 400,
   },
   sectionContainer: {
     paddingVertical: 12,

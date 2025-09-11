@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,18 @@ import {
   ScrollView,
   Modal,
   Image,
-} from 'react-native';
-import { styles } from './css/styles';
+} from "react-native";
+import { styles } from "./css/styles";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
-const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMenuItem = 'dashboard' }) => {
+const Sidebar = ({
+  isVisible,
+  onClose,
+  onProfilePress,
+  onMenuItemPress,
+  activeMenuItem = "dashboard",
+}) => {
   const slideAnim = useRef(new Animated.Value(-width * 0.85)).current;
 
   useEffect(() => {
@@ -38,49 +44,70 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
       <View style={styles.settingsIcon}>
         <View style={styles.settingsCenter} />
         <View style={[styles.settingsTooth, { top: -3, left: 6 }]} />
-        <View style={[styles.settingsTooth, { top: 6, right: -3, transform: [{ rotate: '90deg' }] }]} />
-        <View style={[styles.settingsTooth, { bottom: -3, left: 6, transform: [{ rotate: '180deg' }] }]} />
-        <View style={[styles.settingsTooth, { top: 6, left: -3, transform: [{ rotate: '270deg' }] }]} />
+        <View
+          style={[
+            styles.settingsTooth,
+            { top: 6, right: -3, transform: [{ rotate: "90deg" }] },
+          ]}
+        />
+        <View
+          style={[
+            styles.settingsTooth,
+            { bottom: -3, left: 6, transform: [{ rotate: "180deg" }] },
+          ]}
+        />
+        <View
+          style={[
+            styles.settingsTooth,
+            { top: 6, left: -3, transform: [{ rotate: "270deg" }] },
+          ]}
+        />
       </View>
     </View>
   );
 
   const menuItems = [
-    { 
-      id: 'dashboard', 
-      title: 'Dashboard', 
-      icon: require('../../../assets/dashboard-icon.png'),
-      isImage: true
+    {
+      id: "dashboard",
+      title: "Dashboard",
+      icon: require("../../../assets/dashboard-icon.png"),
+      isImage: true,
     },
-    { 
-      id: 'reports', 
-      title: 'Reports', 
-      icon: require('../../../assets/report-icon.png'),
-      isImage: true
+    {
+      id: "reports",
+      title: "Reports",
+      icon: require("../../../assets/report-icon.png"),
+      isImage: true,
     },
-    { 
-      id: 'raffle', 
-      title: 'Raffle', 
-      icon: require('../../../assets/raffle-icon.png'),
-      isImage: true
+    {
+      id: "raffle",
+      title: "Raffle",
+      icon: require("../../../assets/raffle-icon.png"),
+      isImage: true,
     },
-    { 
-      id: 'auction', 
-      title: 'Auction', 
-      icon: require('../../../assets/auction-icon.png'),
-      isImage: true
+    {
+      id: "auction",
+      title: "Auction",
+      icon: require("../../../assets/auction-icon.png"),
+      isImage: true,
     },
-    { 
-      id: 'settings', 
-      title: 'Settings', 
-      icon: require('../../../assets/Settings-icon.png'),
-      isImage: true
+    {
+      id: "settings",
+      title: "Settings",
+      icon: require("../../../assets/Settings-icon.png"),
+      isImage: true,
     },
-    { 
-      id: 'notifications', 
-      title: 'Notifications', 
-      icon: require('../../../assets/Notifications-icon.png'),
-      isImage: true
+    {
+      id: "payment",
+      title: "Payment",
+      icon: require("../../../assets/payment-icon.png"),
+      isImage: true,
+    },
+    {
+      id: "notifications",
+      title: "Notifications",
+      icon: require("../../../assets/Notifications-icon.png"),
+      isImage: true,
     },
   ];
 
@@ -92,20 +119,17 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
       onRequestClose={onClose}
     >
       <View style={styles.container}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.overlay}
           onPress={onClose}
           activeOpacity={1}
         />
-        
-        <Animated.View 
-          style={[
-            styles.sidebar,
-            { transform: [{ translateX: slideAnim }] }
-          ]}
+
+        <Animated.View
+          style={[styles.sidebar, { transform: [{ translateX: slideAnim }] }]}
         >
-          <ScrollView 
-            style={styles.content} 
+          <ScrollView
+            style={styles.content}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ flexGrow: 1 }}
           >
@@ -113,7 +137,7 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
             <View style={styles.headerGradient}>
               {/* Profile Section */}
               <View style={styles.profileSection}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.profileContainer}
                   onPress={onProfilePress}
                 >
@@ -125,15 +149,17 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
                   </View>
                   <View style={styles.profileInfo}>
                     <Text style={styles.profileName}>John Doe</Text>
-                    <Text style={styles.profileEmail}>john.doe@example.com</Text>
+                    <Text style={styles.profileEmail}>
+                      john.doe@example.com
+                    </Text>
                     <Text style={styles.profileStatus}>Online</Text>
                   </View>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={styles.addAccountButton}
                   onPress={() => {
-                    console.log('Add account pressed');
+                    console.log("Add account pressed");
                   }}
                 >
                   <Text style={styles.plusIcon}>+</Text>
@@ -149,15 +175,15 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
                   key={item.id}
                   style={[
                     styles.menuItem,
-                    activeMenuItem === item.id && styles.activeMenuItem
+                    activeMenuItem === item.id && styles.activeMenuItem,
                   ]}
                   onPress={() => onMenuItemPress(item.id)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.menuIconContainer}>
                     {item.isImage ? (
-                      <Image 
-                        source={item.icon} 
+                      <Image
+                        source={item.icon}
                         style={styles.menuItemIconImage}
                         resizeMode="contain"
                       />
@@ -165,13 +191,17 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
                       <Text style={styles.menuItemIcon}>{item.icon}</Text>
                     )}
                   </View>
-                  <Text style={[
-                    styles.menuItemText,
-                    activeMenuItem === item.id && styles.activeMenuItemText
-                  ]}>
+                  <Text
+                    style={[
+                      styles.menuItemText,
+                      activeMenuItem === item.id && styles.activeMenuItemText,
+                    ]}
+                  >
                     {item.title}
                   </Text>
-                  {activeMenuItem === item.id && <View style={styles.activeIndicator} />}
+                  {activeMenuItem === item.id && (
+                    <View style={styles.activeIndicator} />
+                  )}
                 </TouchableOpacity>
               ))}
             </View>
@@ -180,9 +210,9 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
           {/* Fixed Bottom Section */}
           <View style={styles.bottomSection}>
             <View style={styles.divider} />
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.logoutItem}
-              onPress={() => onMenuItemPress('logout')}
+              onPress={() => onMenuItemPress("logout")}
               activeOpacity={0.7}
             >
               <View style={styles.logoutIconContainer}>
@@ -193,7 +223,7 @@ const Sidebar = ({ isVisible, onClose, onProfilePress, onMenuItemPress, activeMe
               </View>
               <Text style={styles.logoutText}>Sign Out</Text>
             </TouchableOpacity>
-            
+
             {/* App Version */}
             <View style={styles.versionContainer}>
               <Text style={styles.versionText}>Version 1.2.0</Text>

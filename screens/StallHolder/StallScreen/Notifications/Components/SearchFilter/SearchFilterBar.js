@@ -12,11 +12,12 @@ const SearchFilterBar = ({
   onFilterSelect, 
   selectedSort, 
   onSortSelect,
-  searchPlaceholder = "Search stalls, location, or floor...",
-  filters = ['ALL', 'NCPM', 'SATELLITE MARKET'],
+  searchPlaceholder = "Search notifications...",
+  filters = ['ALL', 'ORDER', 'SYSTEM', 'PROMOTION', 'ANNOUNCEMENT'],
   sortOptions = [
-    { label: 'Price: Low to High', value: 'price_asc' },
-    { label: 'Price: High to Low', value: 'price_desc' },
+    { label: 'Newest First', value: 'newest' },
+    { label: 'Oldest First', value: 'oldest' },
+    { label: 'Unread First', value: 'unread' },
     { label: 'Default', value: 'default' }
   ]
 }) => {
