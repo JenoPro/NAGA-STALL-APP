@@ -1,7 +1,7 @@
-import { StyleSheet, } from "react-native";
+import { StyleSheet } from "react-native";
 
 export const AuctionCardStyles = StyleSheet.create({
- auctionCard: {
+  auctionCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 15,
     marginBottom: 15,
@@ -182,13 +182,38 @@ export const AuctionCardStyles = StyleSheet.create({
   },
   preRegisterButton: {
     backgroundColor: "#0284C7",
+    marginBottom: 10,
   },
   preRegisterButtonText: {
     color: "#FFFFFF",
   },
+  placeBidButton: {
+    backgroundColor: "#F59E0B",
+  },
+  placeBidButtonDisabled: {
+    backgroundColor: "#D1D5DB",
+  },
+  placeBidButtonText: {
+    color: "#FFFFFF",
+  },
+  placeBidButtonTextDisabled: {
+    color: "#9CA3AF",
+  },
+  buttonContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  countdownText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginTop: 4,
+  },
+  countdownTextDisabled: {
+    color: "#9CA3AF",
+  },
   disabledButton: {
-  backgroundColor: "#ccc",
-  opacity: 0.7,
-},
-
+    backgroundColor: "#ccc",
+    opacity: 0.7,
+  },
 });

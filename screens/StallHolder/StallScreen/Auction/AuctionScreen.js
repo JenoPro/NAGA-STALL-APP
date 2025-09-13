@@ -15,11 +15,19 @@ const auctionStallsData = [
     stallNumber: "50",
     price: "2,100",
     priceValue: 2100,
+    currentBid: 2350,
+    currentBidder: {
+      name: "Juan D.",
+      avatar: "👨‍💼",
+      location: "Manila",
+      bidTime: "2 minutes ago",
+      totalBids: 12,
+    },
     location: "SATELLITE MARKET",
     floor: "2nd Floor / Grocery Section",
     size: "3x1 meters",
     status: "available",
-    auctionDate: "March 15, 2025",
+    auctionDate: "September 14, 2025",
     image:
       "https://i.pinimg.com/originals/b8/7f/96/b87f9661d0f56d6d88c8e1462e4c68a3.jpg",
     stallDescription:
@@ -30,11 +38,19 @@ const auctionStallsData = [
     stallNumber: "32",
     price: "2,500",
     priceValue: 2500,
+    currentBid: 2800,
+    currentBidder: {
+      name: "Maria S.",
+      avatar: "👩‍💼",
+      location: "Quezon City",
+      bidTime: "5 minutes ago",
+      totalBids: 8,
+    },
     location: "SATELLITE MARKET",
     floor: "Ground Floor / Main Section",
     size: "3x3 meters",
     status: "available",
-    auctionDate: "March 20, 2025",
+    auctionDate: "September 16, 2025",
     image:
       "https://cdn.broadsheet.com.au/sydney/images/2016/08/12/113402-542-cfe6bf07de43630928ce9225de88c1eb.jpg",
     stallDescription:
@@ -45,11 +61,19 @@ const auctionStallsData = [
     stallNumber: "19",
     price: "2,600",
     priceValue: 2600,
+    currentBid: 3100,
+    currentBidder: {
+      name: "Robert C.",
+      avatar: "👨‍🏭",
+      location: "Naga Ciy",
+      bidTime: "1 minute ago",
+      totalBids: 15,
+    },
     location: "SATELLITE MARKET",
     floor: "2nd Floor / Electronics Section",
     size: "4x3 meters",
     status: "available",
-    auctionDate: "March 25, 2025",
+    auctionDate: "September 13, 2025",
     image:
       "https://i.pinimg.com/originals/60/17/ec/6017ec3acc17f3e0d729d882026f92eb.jpg",
     stallDescription:
