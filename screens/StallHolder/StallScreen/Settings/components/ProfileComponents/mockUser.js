@@ -5,16 +5,16 @@ export const mockUser = {
   // Personal Information
   fullName: "John Doe",
   education: "College Graduate",
-  age: 32,
+  birthDate: "1993-05-12",
   civilStatus: "Married",
   contactNumber: "09123456789",
   mailingAddress: "123 Main Street, Barangay San Miguel, Naga City, Bicol",
 
   // Spouse Information
   spouseName: "Maria Santos Dela Cruz",
-  spouseAge: 29,
+  spouseBirthDate: "1996-08-21",
   spouseEducation: "High School Graduate",
-  occupation: "Teacher", 
+  occupation: "Teacher",
   spouseContact: "09987654321",
 
   // Business Information
@@ -25,14 +25,14 @@ export const mockUser = {
 
   // Other Information
   emailAddress: "john.doe@example.com",
-  stallNumber: "A-10"
+  stallNumber: "A-10",
 };
 
 // Alternative users for testing different scenarios
 export const singleUser = {
   fullName: "Mark Johnson",
   education: "High School Graduate",
-  age: 25,
+  birthDate: "2000-02-17",
   civilStatus: "Single",
   contactNumber: "09234567890",
   mailingAddress: "456 Rizal Avenue, Barangay Carolina, Naga City, Bicol",
@@ -41,19 +41,19 @@ export const singleUser = {
   previousBusiness: "None - First Time Business Owner",
   applicantRelative: "None",
   emailAddress: "mark.johnson@email.com",
-  stallNumber: "B-05"
+  stallNumber: "B-05",
 };
 
 export const collegeGraduateUser = {
   fullName: "Robert Smith",
   education: "Bachelor's Degree in Business",
-  age: 35,
+  birthDate: "1990-11-03",
   civilStatus: "Married",
   contactNumber: "09345678901",
   mailingAddress: "789 Lopez Street, Barangay San Felipe, Naga City, Bicol",
-  
+
   spouseName: "Sarah Smith",
-  spouseAge: 33,
+  spouseBirthDate: "1992-04-15",
   spouseEducation: "Bachelor's Degree in Nursing",
   occupation: "Registered Nurse",
   spouseContact: "09456789012",
@@ -62,25 +62,26 @@ export const collegeGraduateUser = {
   sourceOfCapital: "Personal Savings & Investment",
   previousBusiness: "Computer Shop (2019-2023)",
   applicantRelative: "James Smith - Stall #28",
-  
+
   emailAddress: "robert.smith@gmail.com",
-  stallNumber: "C-18"
+  stallNumber: "C-18",
 };
 
 export const newApplicantUser = {
   fullName: "Michael Brown",
   education: "Vocational Course in Mechanics",
-  age: 28,
+  birthDate: "1997-07-30",
   civilStatus: "Single",
   contactNumber: "09567890123",
-  mailingAddress: "321 Peñafrancia Avenue, Barangay Triangulo, Naga City, Bicol",
-  
+  mailingAddress:
+    "321 Peñafrancia Avenue, Barangay Triangulo, Naga City, Bicol",
+
   businessCapitalization: 35000,
   sourceOfCapital: "OFW Savings",
   previousBusiness: "None",
   applicantRelative: "None",
-  
-  emailAddress: "michael.brown@yahoo.com"
+
+  emailAddress: "michael.brown@yahoo.com",
   // No stallNumber - new applicant
 };
 
@@ -89,7 +90,7 @@ export const allMockUsers = [
   mockUser,
   singleUser,
   collegeGraduateUser,
-  newApplicantUser
+  newApplicantUser,
 ];
 
 // Helper function to get random user

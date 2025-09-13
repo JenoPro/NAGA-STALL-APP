@@ -8,11 +8,13 @@ import {
   Dimensions,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+
+// nav bar and sidebar components
 import Header from "../StallComponents/header";
 import Navbar from "../StallComponents/navbar";
 import Sidebar from "../StallComponents/Sidebar";
 
-// Import all screen components
+// screen components
 import DashboardScreen from "./Dashboard/DashboardScreen";
 import ReportsScreen from "./Report/ReportsScreen";
 import RaffleScreen from "./Raffle/RaffleScreen";
@@ -90,8 +92,9 @@ const StallHome = ({ navigation }) => {
     if (currentScreen === "stall") {
       return "Stall";
     }
-    // For sidebar screens (dashboard, reports, raffle, auction, settings, notifications)
-    // return null to show no active state in navbar
+    if (currentScreen === "payment") {
+      return "Payment";
+    }
     return null;
   };
 
@@ -146,6 +149,7 @@ const StallHome = ({ navigation }) => {
           activeTab={getActiveNavTab()}
           onStallPress={() => handleNavigation("stall")}
           onDocumentsPress={() => handleNavigation("documents")}
+          onPaymentPress={() => handleNavigation("payment")}
         />
 
         {/* Sidebar Component */}

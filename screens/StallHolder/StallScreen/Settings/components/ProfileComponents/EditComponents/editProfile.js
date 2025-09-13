@@ -67,14 +67,14 @@ const InputField = React.memo(function InputField({
 const EditProfileModal = ({ visible, onClose, user, onSave }) => {
   const [formData, setFormData] = useState({
     fullName: user?.fullName || "",
-    age: user?.age?.toString() || "",
+    birthDate: user?.birthDate || "",
     civilStatus: user?.civilStatus || "",
     education: user?.education || "",
     contactNumber: user?.contactNumber || "",
     mailingAddress: user?.mailingAddress || "",
     emailAddress: user?.emailAddress || "",
     spouseName: user?.spouseName || "",
-    spouseAge: user?.spouseAge?.toString() || "",
+    spouseBirthDate: user?.spouseBirthDate || "",
     spouseEducation: user?.spouseEducation || "",
     occupation: user?.occupation || "",
     spouseContact: user?.spouseContact || "",
@@ -100,10 +100,8 @@ const EditProfileModal = ({ visible, onClose, user, onSave }) => {
     if (formData.civilStatus !== "Single") {
       if (!formData.spouseName.trim())
         newErrors.spouseName = "Spouse name is required";
-      if (!formData.spouseAge.trim()) {
-        newErrors.spouseAge = "Spouse age is required";
-      } else if (isNaN(parseInt(formData.spouseAge))) {
-        newErrors.spouseAge = "Please enter a valid age";
+      if (!formData.spouseBirthDate.trim()) {
+        newErrors.spouseBirthDate = "Spouse birth date is required";
       }
       if (!formData.spouseEducation.trim())
         newErrors.spouseEducation = "Spouse education is required";
@@ -216,10 +214,10 @@ const EditProfileModal = ({ visible, onClose, user, onSave }) => {
                 styles={styles}
               />
               <InputField
-                label="Age"
-                {...bind("age")}
-                placeholder="Enter your age"
-                keyboardType="numeric"
+                label="Birth Date"
+                {...bind("birthDate")}
+                placeholder="YYYY-MM-DD"
+                keyboardType="default"
                 editable={false}
                 styles={styles}
               />
@@ -276,10 +274,10 @@ const EditProfileModal = ({ visible, onClose, user, onSave }) => {
                     styles={styles}
                   />
                   <InputField
-                    label="Spouse Age *"
-                    {...bind("spouseAge")}
-                    placeholder="Enter spouse's age"
-                    keyboardType="numeric"
+                    label="Spouse Birth Date *"
+                    {...bind("spouseBirthDate")}
+                    placeholder="YYYY-MM-DD"
+                    keyboardType="default"
                     editable={true}
                     styles={styles}
                   />

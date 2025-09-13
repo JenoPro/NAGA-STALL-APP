@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { mockUser } from "../mockUser";
 import EditProfileModal from "../EditComponents/editProfile";
@@ -28,14 +23,14 @@ const ProfileDisplay = ({ user, onGoBack, onUpdateUser }) => {
     // personal Information
     fullName: currentUser?.fullName || mockUser.fullName,
     education: currentUser?.education || mockUser.education,
-    age: currentUser?.age || mockUser.age,
+    birthDate: currentUser?.birthDate || mockUser.birthDate,
     civilStatus: currentUser?.civilStatus || mockUser.civilStatus,
     contactNumber: currentUser?.contactNumber || mockUser.contactNumber,
     mailingAddress: currentUser?.mailingAddress || mockUser.mailingAddress,
 
     // spouse Information
     spouseName: currentUser?.spouseName || mockUser.spouseName,
-    spouseAge: currentUser?.spouseAge || mockUser.spouseAge,
+    spouseBirthDate: currentUser?.spouseBirthDate || mockUser.spouseBirthDate,
     spouseEducation: currentUser?.spouseEducation || mockUser.spouseEducation,
     occupation: currentUser?.occupation || mockUser.occupation,
     spouseContact: currentUser?.spouseContact || mockUser.spouseContact,
@@ -58,7 +53,7 @@ const ProfileDisplay = ({ user, onGoBack, onUpdateUser }) => {
     setCurrentUser(updatedData);
     setIsEditModalVisible(false);
 
-  // if the parent component provided an update handler, call it
+    // if the parent component provided an update handler, call it
     if (onUpdateUser) {
       onUpdateUser(updatedData);
     }
@@ -112,7 +107,7 @@ const ProfileDisplay = ({ user, onGoBack, onUpdateUser }) => {
 
         <InfoSection title="Personal Information">
           <InfoRow label="Full Name" value={profileData.fullName} />
-          <InfoRow label="Age" value={profileData.age?.toString()} />
+          <InfoRow label="Birth Date" value={profileData.birthDate} />
           <InfoRow label="Civil Status" value={profileData.civilStatus} />
           <InfoRow label="Education" value={profileData.education} />
           <InfoRow label="Contact Number" value={profileData.contactNumber} />
@@ -123,8 +118,8 @@ const ProfileDisplay = ({ user, onGoBack, onUpdateUser }) => {
           <InfoSection title="Spouse Information">
             <InfoRow label="Spouse Name" value={profileData.spouseName} />
             <InfoRow
-              label="Spouse Age"
-              value={profileData.spouseAge?.toString()}
+              label="Spouse Birth Date"
+              value={profileData.spouseBirthDate}
             />
             <InfoRow
               label="Spouse Education"
@@ -179,5 +174,5 @@ const ProfileDisplay = ({ user, onGoBack, onUpdateUser }) => {
 };
 
 import { ProfileStyles as styles } from "./ProfileStyles";
- 
+
 export default ProfileDisplay;
