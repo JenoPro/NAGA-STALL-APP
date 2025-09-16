@@ -7,6 +7,7 @@ const PreRegisterModal = ({
   stallNumber,
   auctionDate,
   location,
+  auctionType = "Online Auction",
 }) => {
   return (
     <Modal
@@ -48,8 +49,8 @@ const PreRegisterModal = ({
             </View>
 
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Venue:</Text>
-              <Text style={styles.detailValue}> MEPO Office</Text>
+              <Text style={styles.detailLabel}>Auction Type:</Text>
+              <Text style={styles.detailValue}>{auctionType}</Text>
             </View>
           </View>
 
@@ -57,14 +58,16 @@ const PreRegisterModal = ({
           <View style={styles.instructionsContainer}>
             <Text style={styles.instructionsTitle}>Important Notes:</Text>
             <Text style={styles.instructionsText}>
-              • Please arrive at the MEPO office 20-30 minutes before the
-              auction
+              1. Ensure you have a stable internet connection during the auction
             </Text>
             <Text style={styles.instructionsText}>
-              • Bring any valid ID for verification
+              2. Have your valid ID ready for verification if required
             </Text>
             <Text style={styles.instructionsText}>
-              • Bring all the documents required for the auction
+              3. Prepare all necessary documents digitally for upload
+            </Text>
+            <Text style={styles.instructionsText}>
+              4. Join the auction 10-15 minutes before the scheduled time
             </Text>
           </View>
 

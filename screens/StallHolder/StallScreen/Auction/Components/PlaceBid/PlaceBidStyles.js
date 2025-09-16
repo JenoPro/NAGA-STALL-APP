@@ -43,7 +43,7 @@ export const PlaceBidStyles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
   },
   scrollContentContainer: {
-    paddingBottom: 120, // Space for bottom buttons
+    paddingBottom: 120,
     flexGrow: 1,
   },
 

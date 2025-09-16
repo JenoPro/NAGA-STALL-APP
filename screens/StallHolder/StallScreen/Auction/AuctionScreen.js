@@ -27,7 +27,7 @@ const auctionStallsData = [
     floor: "2nd Floor / Grocery Section",
     size: "3x1 meters",
     status: "available",
-    auctionDate: "September 14, 2025",
+    auctionDate: "September 16, 2025",
     image:
       "https://i.pinimg.com/originals/b8/7f/96/b87f9661d0f56d6d88c8e1462e4c68a3.jpg",
     stallDescription:
@@ -50,7 +50,7 @@ const auctionStallsData = [
     floor: "Ground Floor / Main Section",
     size: "3x3 meters",
     status: "available",
-    auctionDate: "September 16, 2025",
+    auctionDate: "September 17, 2025",
     image:
       "https://cdn.broadsheet.com.au/sydney/images/2016/08/12/113402-542-cfe6bf07de43630928ce9225de88c1eb.jpg",
     stallDescription:
@@ -65,7 +65,7 @@ const auctionStallsData = [
     currentBidder: {
       name: "Robert C.",
       avatar: "👨‍🏭",
-      location: "Naga Ciy",
+      location: "Naga City",
       bidTime: "1 minute ago",
       totalBids: 15,
     },
@@ -73,7 +73,7 @@ const auctionStallsData = [
     floor: "2nd Floor / Electronics Section",
     size: "4x3 meters",
     status: "available",
-    auctionDate: "September 13, 2025",
+    auctionDate: "September 18, 2025",
     image:
       "https://i.pinimg.com/originals/60/17/ec/6017ec3acc17f3e0d729d882026f92eb.jpg",
     stallDescription:

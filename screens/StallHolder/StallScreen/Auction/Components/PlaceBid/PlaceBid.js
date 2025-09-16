@@ -9,8 +9,9 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import SubmitBid from "./SuccessBidModal";
-import HighestBidder from "./HighestBidder";
+import SubmitBid from "./SuccessModal/SuccessBidModal";
+import HighestBidder from "./HighestBidder/HighestBidder";
+import QuickBid from "../QuickBid/QuickBid";
 
 const PlaceBid = ({
   visible,
@@ -50,43 +51,85 @@ const PlaceBid = ({
   };
 
   const isAuctionActive = () => {
-    const now = new Date();
+    if (!auctionDate) return false;
 
+    const now = new Date();
     let auctionDay;
+
     try {
+      // Try standard date parsing first
       auctionDay = new Date(auctionDate);
 
-      // If parsing fails, try manual parsing
+      // If parsing fails, try manual parsing for "Month Day, Year" format
       if (isNaN(auctionDay.getTime())) {
-        const dateParts = auctionDate.split(" ");
+        const dateParts = auctionDate.trim().split(" ");
         if (dateParts.length === 3) {
           const month = dateParts[0];
           const day = parseInt(dateParts[1].replace(",", ""));
           const year = parseInt(dateParts[2]);
-          auctionDay = new Date(year, getMonthNumber(month), day);
+
+          if (!isNaN(day) && !isNaN(year)) {
+            auctionDay = new Date(year, getMonthNumber(month), day);
+          }
         }
       }
+
+      // If still invalid, return false
+      if (isNaN(auctionDay.getTime())) {
+        return false;
+      }
     } catch (error) {
-      return true; // Default to true if parsing fails
+      console.warn("Date parsing error:", error);
+      return false;
     }
 
-    return now >= auctionDay;
+    // Set time to start of day for accurate comparison
+    const auctionStart = new Date(auctionDay);
+    auctionStart.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return today >= auctionStart;
   };
 
   const getMinimumBid = () => {
     return currentBid ? currentBid + minimumIncrement : startingPrice;
   };
 
+  // validation function
   const validateBid = (amount) => {
     const numAmount = parseFloat(amount);
     const minBid = getMinimumBid();
 
-    if (!amount || isNaN(numAmount)) {
-      return "Please enter a valid bid amount";
+    // Check if amount is provided and is a valid number
+    if (!amount || amount.trim() === "") {
+      return "Please enter a bid amount";
     }
 
+    if (isNaN(numAmount) || numAmount <= 0) {
+      return "Please enter a valid positive number";
+    }
+
+    // Check decimal places (max 2)
+    if (amount.includes(".") && amount.split(".")[1].length > 2) {
+      return "Bid amount can have maximum 2 decimal places";
+    }
+
+    // Check minimum bid requirement
     if (numAmount < minBid) {
       return `Bid must be at least ₱${minBid.toLocaleString()}`;
+    }
+
+    // Check if bid is too high (reasonable maximum)
+    const maxBid = startingPrice * 10; // 10x starting price as max
+    if (numAmount > maxBid) {
+      return `Bid cannot exceed ₱${maxBid.toLocaleString()}`;
+    }
+
+    // Check if increment is too small (must be at least minimum increment)
+    if (currentBid && numAmount - currentBid < minimumIncrement) {
+      return `Bid increment must be at least ₱${minimumIncrement.toLocaleString()}`;
     }
 
     return "";
@@ -99,29 +142,49 @@ const PlaceBid = ({
       return;
     }
 
+    // Check if auction is still active before submitting
+    if (!isAuctionActive()) {
+      setBidError("Auction is not currently active");
+      return;
+    }
+
     setIsSubmitting(true);
     setBidError("");
 
     try {
-      await onSubmitBid({
+      const bidData = {
         stallNumber,
         bidAmount: parseFloat(bidAmount),
         timestamp: new Date().toISOString(),
-      });
+        previousBid: currentBid,
+        minimumIncrement,
+      };
 
+      await onSubmitBid(bidData);
       setIsSuccess(true);
     } catch (error) {
-      setBidError("Failed to submit bid. Please try again.");
+      console.error("Bid submission error:", error);
+      setBidError(error.message || "Failed to submit bid. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle bid amount change
+  // Handle bid amount change with improved formatting
   const handleBidChange = (text) => {
     const cleanedText = text.replace(/[^0-9.]/g, "");
-    setBidAmount(cleanedText);
 
+    // Prevent multiple decimal points
+    const parts = cleanedText.split(".");
+    let formattedText = parts[0];
+    if (parts.length > 1) {
+      // Keep only first decimal point and limit to 2 decimal places
+      formattedText += "." + parts[1].substring(0, 2);
+    }
+
+    setBidAmount(formattedText);
+
+    // Clear errors when user starts typing
     if (bidError) {
       setBidError("");
     }
@@ -193,31 +256,31 @@ const PlaceBid = ({
 
               <View style={styles.stallDetails}>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>📍 Location</Text>
+                  <Text style={styles.detailLabel}>Location</Text>
                   <Text style={styles.detailValue}>{location}</Text>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>💰 Starting Price</Text>
+                  <Text style={styles.detailLabel}>Starting Price</Text>
                   <Text style={styles.detailValue}>
                     ₱{startingPrice?.toLocaleString()}
                   </Text>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>📅 Auction Date</Text>
+                  <Text style={styles.detailLabel}>Auction Date</Text>
                   <Text style={styles.detailValue}>{auctionDate}</Text>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>⏰ Status</Text>
+                  <Text style={styles.detailLabel}>Status</Text>
                   <Text
                     style={[
                       styles.detailValue,
                       { color: isAuctionActive() ? "#10B981" : "#F59E0B" },
                     ]}
                   >
-                    {isAuctionActive() ? "🟢 Live Auction" : "⏳ Upcoming"}
+                    {isAuctionActive() ? "Live Auction" : "Upcoming"}
                   </Text>
                 </View>
               </View>
@@ -257,6 +320,17 @@ const PlaceBid = ({
                   <Text style={styles.minimumBidNote}>
                     Minimum bid: ₱{getMinimumBid().toLocaleString()}
                   </Text>
+
+                  {/* QuickBid Component */}
+                  <QuickBid
+                    bidAmount={bidAmount}
+                    setBidAmount={setBidAmount}
+                    getMinimumBid={getMinimumBid}
+                    minimumIncrement={minimumIncrement}
+                    isSubmitting={isSubmitting}
+                    bidError={bidError}
+                    setBidError={setBidError}
+                  />
 
                   {bidError && <Text style={styles.errorText}>{bidError}</Text>}
                 </>
