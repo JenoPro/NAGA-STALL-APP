@@ -1,4 +1,5 @@
 import { View, Text } from "react-native";
+import { useTheme } from "../../../../Settings/components/ThemeComponents/ThemeContext";
 import { HighestBidderStyles as styles } from "./HighestBidderStyles";
 
 const HighestBidder = ({
@@ -7,6 +8,7 @@ const HighestBidder = ({
   showLiveBadge = true,
   useFallbackData = true,
 }) => {
+  const { theme } = useTheme();
   const getFallbackBidder = () => {
     // Static sample data with fixed typo
     const fallbackBidders = [
@@ -69,9 +71,24 @@ const HighestBidder = ({
   // If no bidder data and fallback is disabled, don't show bidder info
   if (!bidderData) {
     return (
-      <View style={styles.currentBidCard}>
+      <View
+        style={[
+          styles.currentBidCard,
+          {
+            backgroundColor: theme.colors.card,
+            borderColor: theme.colors.border,
+          },
+        ]}
+      >
         <View style={styles.currentBidHeader}>
-          <Text style={styles.currentBidLabel}>Current Highest Bid</Text>
+          <Text
+            style={[
+              styles.currentBidLabel,
+              { color: theme.colors.textSecondary },
+            ]}
+          >
+            Current Highest Bid
+          </Text>
           {showLiveBadge && (
             <View style={styles.liveBadge}>
               <Text style={styles.liveBadgeText}>LIVE</Text>
@@ -79,11 +96,15 @@ const HighestBidder = ({
           )}
         </View>
 
-        <Text style={styles.currentBidAmount}>
+        <Text
+          style={[styles.currentBidAmount, { color: theme.colors.primary }]}
+        >
           ₱{currentBid.toLocaleString()}
         </Text>
 
-        <Text style={styles.currentBidNote}>
+        <Text
+          style={[styles.currentBidNote, { color: theme.colors.textSecondary }]}
+        >
           You need to bid higher than this amount to become the leading bidder
         </Text>
       </View>
@@ -91,9 +112,24 @@ const HighestBidder = ({
   }
 
   return (
-    <View style={styles.currentBidCard}>
+    <View
+      style={[
+        styles.currentBidCard,
+        {
+          backgroundColor: theme.colors.card,
+          borderColor: theme.colors.border,
+        },
+      ]}
+    >
       <View style={styles.currentBidHeader}>
-        <Text style={styles.currentBidLabel}>Current Highest Bid</Text>
+        <Text
+          style={[
+            styles.currentBidLabel,
+            { color: theme.colors.textSecondary },
+          ]}
+        >
+          Current Highest Bid
+        </Text>
         {showLiveBadge && (
           <View style={styles.liveBadge}>
             <Text style={styles.liveBadgeText}>LIVE</Text>
@@ -101,30 +137,53 @@ const HighestBidder = ({
         )}
       </View>
 
-      <Text style={styles.currentBidAmount}>
+      <Text style={[styles.currentBidAmount, { color: theme.colors.primary }]}>
         ₱{currentBid.toLocaleString()}
       </Text>
 
       {/* Bidder Information */}
-      <View style={styles.bidderInfo}>
-        <View style={styles.bidderAvatar}>
+      <View
+        style={[styles.bidderInfo, { backgroundColor: theme.colors.surface }]}
+      >
+        <View
+          style={[
+            styles.bidderAvatar,
+            { backgroundColor: theme.colors.background },
+          ]}
+        >
           <Text style={styles.bidderAvatarText}>{bidderData.avatar}</Text>
         </View>
         <View style={styles.bidderDetails}>
           <View style={styles.bidderNameRow}>
-            <Text style={styles.bidderName}>{bidderData.name}</Text>
-            <Text style={styles.bidderLocation}>📍 {bidderData.location}</Text>
+            <Text style={[styles.bidderName, { color: theme.colors.text }]}>
+              {bidderData.name}
+            </Text>
+            <Text
+              style={[
+                styles.bidderLocation,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              📍 {bidderData.location}
+            </Text>
           </View>
           <View style={styles.bidderMetaRow}>
             <Text style={styles.bidderTime}>⏱️ {bidderData.bidTime}</Text>
-            <Text style={styles.bidderStats}>
+            <Text
+              style={[
+                styles.bidderStats,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
               🎯 {bidderData.totalBids} total bids
             </Text>
           </View>
         </View>
       </View>
 
-      <Text style={styles.currentBidNote}>
+      <Text
+        style={[styles.currentBidNote, { color: theme.colors.textSecondary }]}
+      >
         You need to bid higher than this amount to become the leading bidder
       </Text>
     </View>

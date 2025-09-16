@@ -13,7 +13,7 @@ export const QuickBidStyles = StyleSheet.create({
     marginBottom: 12,
   },
   outbidButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#1E9C00",
     borderRadius: 12,
     padding: 16,
     alignItems: "center",
@@ -42,7 +42,7 @@ export const QuickBidStyles = StyleSheet.create({
   },
   quickIncrementButton: {
     flex: 1,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#305CDE",
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -71,7 +71,7 @@ export const QuickBidStyles = StyleSheet.create({
     fontWeight: "500",
     color: "#6B7280",
   },
-  
+
   // Disabled States
   disabledButton: {
     opacity: 0.5,

@@ -2,7 +2,6 @@ import { StyleSheet } from "react-native";
 
 export const AuctionCardStyles = StyleSheet.create({
   auctionCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 15,
     marginBottom: 15,
     shadowColor: "#000",
@@ -15,7 +14,6 @@ export const AuctionCardStyles = StyleSheet.create({
     elevation: 5,
     overflow: "hidden",
     borderWidth: 2,
-    borderColor: "#1E9C00",
   },
   cardHeader: {
     position: "relative",
@@ -74,7 +72,6 @@ export const AuctionCardStyles = StyleSheet.create({
   stallNumberContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F4F6",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -82,13 +79,11 @@ export const AuctionCardStyles = StyleSheet.create({
   stallLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#6B7280",
     marginRight: 4,
   },
   stallNumber: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#1F2937",
   },
   locationContainer: {
     backgroundColor: "#002181",
@@ -99,28 +94,23 @@ export const AuctionCardStyles = StyleSheet.create({
   locationText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#FFFFFF",
   },
   startingPriceContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
-    backgroundColor: "#e6f8ea",
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#1E9C00",
   },
   startingPriceLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1E9C00",
   },
   startingPriceText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#1E9C00",
   },
   detailsContainer: {
     marginBottom: 15,
@@ -128,15 +118,12 @@ export const AuctionCardStyles = StyleSheet.create({
   floorText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1F2937",
     marginBottom: 2,
   },
   sizeText: {
     fontSize: 14,
-    color: "#6B7280",
   },
   stallDescriptionContainer: {
-    backgroundColor: "#F0F9FF",
     padding: 10,
     borderRadius: 7,
     marginBottom: 15,
@@ -147,28 +134,23 @@ export const AuctionCardStyles = StyleSheet.create({
   stallDescriptionLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#002181",
   },
   auctionDateContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#F0F9FF",
     padding: 10,
     borderRadius: 8,
     marginBottom: 15,
     borderLeftWidth: 4,
-    borderLeftColor: "#0284C7",
   },
   auctionDateLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#0C4A6E",
   },
   auctionDateText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#0369A1",
   },
   statusButton: {
     paddingVertical: 12,
@@ -181,24 +163,13 @@ export const AuctionCardStyles = StyleSheet.create({
     fontWeight: "bold",
   },
   preRegisterButton: {
-    backgroundColor: "#0284C7",
     marginBottom: 10,
   },
-  preRegisterButtonText: {
-    color: "#FFFFFF",
-  },
-  placeBidButton: {
-    backgroundColor: "#F59E0B",
-  },
-  placeBidButtonDisabled: {
-    backgroundColor: "#D1D5DB",
-  },
-  placeBidButtonText: {
-    color: "#FFFFFF",
-  },
-  placeBidButtonTextDisabled: {
-    color: "#9CA3AF",
-  },
+  preRegisterButtonText: {},
+  placeBidButton: {},
+  placeBidButtonDisabled: {},
+  placeBidButtonText: {},
+  placeBidButtonTextDisabled: {},
   buttonContent: {
     alignItems: "center",
     justifyContent: "center",
@@ -206,14 +177,10 @@ export const AuctionCardStyles = StyleSheet.create({
   countdownText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#FFFFFF",
     marginTop: 4,
   },
-  countdownTextDisabled: {
-    color: "#9CA3AF",
-  },
+  countdownTextDisabled: {},
   disabledButton: {
-    backgroundColor: "#ccc",
     opacity: 0.7,
   },
 });

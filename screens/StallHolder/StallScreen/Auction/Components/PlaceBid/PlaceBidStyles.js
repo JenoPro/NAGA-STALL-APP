@@ -4,7 +4,6 @@ const { width, height } = Dimensions.get("window");
 export const PlaceBidStyles = StyleSheet.create({
   fullScreenContainer: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
     paddingTop: StatusBar.currentHeight || 44,
   },
   header: {
@@ -13,9 +12,7 @@ export const PlaceBidStyles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -27,20 +24,17 @@ export const PlaceBidStyles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: "#3B82F6",
     fontWeight: "600",
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#1F2937",
   },
   headerSpacer: {
     width: 60,
   },
   scrollContainer: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
   },
   scrollContentContainer: {
     paddingBottom: 120,
@@ -50,8 +44,8 @@ export const PlaceBidStyles = StyleSheet.create({
   // Stall Information Card
   stallInfoCard: {
     margin: 20,
-    backgroundColor: "#FFFFFF",
     borderRadius: 16,
+    borderWidth: 1,
     padding: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -66,7 +60,7 @@ export const PlaceBidStyles = StyleSheet.create({
     marginBottom: 20,
   },
   stallNumberBadge: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#305CDE",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -98,13 +92,11 @@ export const PlaceBidStyles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 14,
-    color: "#6B7280",
     fontWeight: "600",
     flex: 1,
   },
   detailValue: {
     fontSize: 14,
-    color: "#1F2937",
     fontWeight: "bold",
     flex: 1,
     textAlign: "right",
@@ -172,7 +164,7 @@ export const PlaceBidStyles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 8,
     borderLeftWidth: 3,
-    borderLeftColor: "#10B981",
+    borderLeftColor: "#1E9C00",
     width: "100%",
   },
 
@@ -217,7 +209,6 @@ export const PlaceBidStyles = StyleSheet.create({
 
   bidderLocation: {
     fontSize: 12,
-    color: "#6B7280",
   },
 
   bidderMetaRow: {
@@ -228,33 +219,32 @@ export const PlaceBidStyles = StyleSheet.create({
 
   bidderTime: {
     fontSize: 12,
-    color: "#10B981",
+    color: "#1E9C00",
     fontWeight: "500",
   },
 
   bidderStats: {
     fontSize: 12,
-    color: "#6B7280",
   },
 
   // Bid Section
   bidSection: {
     marginHorizontal: 20,
     marginBottom: 100,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 20,
   },
   bidSectionTitle: {
     fontSize: 17,
     fontWeight: "bold",
-    color: "#1F2937",
     marginBottom: 16,
   },
   bidInputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#D1D5DB",
     marginBottom: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -265,7 +255,6 @@ export const PlaceBidStyles = StyleSheet.create({
   currencySymbol: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#1F2937",
     paddingLeft: 16,
     paddingRight: 8,
   },
@@ -273,35 +262,27 @@ export const PlaceBidStyles = StyleSheet.create({
     flex: 1,
     fontSize: 24,
     fontWeight: "600",
-    color: "#1F2937",
     paddingVertical: 16,
     paddingRight: 16,
   },
-  bidInputFocused: {
-    borderColor: "#10B981",
-  },
-  bidInputError: {
-    borderColor: "#EF4444",
-  },
+  bidInputFocused: {},
+  bidInputError: {},
   minimumBidNote: {
     fontSize: 14,
-    color: "#6B7280",
     marginBottom: 8,
     fontStyle: "italic",
   },
   errorText: {
     fontSize: 14,
-    color: "#EF4444",
     marginTop: 4,
   },
 
   // Auction Not Active Card
   auctionNotActiveCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 16,
+    borderWidth: 2,
     padding: 32,
     alignItems: "center",
-    borderWidth: 2,
     borderColor: "#FDE68A",
     borderStyle: "dashed",
   },
@@ -312,12 +293,10 @@ export const PlaceBidStyles = StyleSheet.create({
   auctionNotActiveTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#92400E",
     marginBottom: 8,
   },
   auctionNotActiveMessage: {
     fontSize: 14,
-    color: "#6B7280",
     textAlign: "center",
     lineHeight: 20,
   },
@@ -327,9 +306,7 @@ export const PlaceBidStyles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
     gap: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
@@ -339,7 +316,6 @@ export const PlaceBidStyles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: "#F3F4F6",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
@@ -348,23 +324,18 @@ export const PlaceBidStyles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#6B7280",
   },
   submitButton: {
     flex: 2,
-    backgroundColor: "#10B981",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
   },
-  submitButtonDisabled: {
-    backgroundColor: "#D1D5DB",
-  },
+  submitButtonDisabled: {},
   submitButtonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#FFFFFF",
   },
   submitButtonTextDisabled: {
     color: "#9CA3AF",

@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
+import { useTheme } from "../../../../Settings/components/ThemeComponents/ThemeContext";
 import { QuickBidStyles as styles } from "./QuickBidStyles";
 
 const QuickBid = ({
@@ -13,6 +14,7 @@ const QuickBid = ({
   onOutbid,
   onSetMinimum,
 }) => {
+  const { theme } = useTheme();
   const quickBidIncrements = [100, 500, 1000];
 
   // Quick bid functions

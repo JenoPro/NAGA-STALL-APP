@@ -9,9 +9,10 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
+import { useTheme } from "../../../Settings/components/ThemeComponents/ThemeContext";
 import SubmitBid from "./SuccessModal/SuccessBidModal";
 import HighestBidder from "./HighestBidder/HighestBidder";
-import QuickBid from "../QuickBid/QuickBid";
+import QuickBid from "./QuickBid/QuickBid";
 
 const PlaceBid = ({
   visible,
@@ -25,6 +26,7 @@ const PlaceBid = ({
   onSubmitBid,
   currentBidder = null,
 }) => {
+  const { theme } = useTheme();
   const [bidAmount, setBidAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bidError, setBidError] = useState("");
@@ -219,13 +221,32 @@ const PlaceBid = ({
       onRequestClose={handleClose}
       statusBarTranslucent={true}
     >
-      <View style={styles.fullScreenContainer}>
+      <View
+        style={[
+          styles.fullScreenContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
         {/* Header */}
-        <View style={styles.header}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: theme.colors.surface,
+              borderBottomColor: theme.colors.border,
+            },
+          ]}
+        >
           <TouchableOpacity onPress={handleClose} style={styles.backButton}>
-            <Text style={styles.backButtonText}>Back</Text>
+            <Text
+              style={[styles.backButtonText, { color: theme.colors.primary }]}
+            >
+              Back
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Place Your Bid</Text>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+            Place Your Bid
+          </Text>
           <View style={styles.headerSpacer} />
         </View>
 
@@ -242,7 +263,15 @@ const PlaceBid = ({
             keyboardDismissMode="interactive"
           >
             {/* Stall Information Card */}
-            <View style={styles.stallInfoCard}>
+            <View
+              style={[
+                styles.stallInfoCard,
+                {
+                  backgroundColor: theme.colors.card,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            >
               <View style={styles.stallHeader}>
                 <View style={styles.stallNumberBadge}>
                   <Text style={styles.stallNumberText}>
@@ -256,24 +285,62 @@ const PlaceBid = ({
 
               <View style={styles.stallDetails}>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Location</Text>
-                  <Text style={styles.detailValue}>{location}</Text>
+                  <Text
+                    style={[
+                      styles.detailLabel,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Location
+                  </Text>
+                  <Text
+                    style={[styles.detailValue, { color: theme.colors.text }]}
+                  >
+                    {location}
+                  </Text>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Starting Price</Text>
-                  <Text style={styles.detailValue}>
+                  <Text
+                    style={[
+                      styles.detailLabel,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Starting Price
+                  </Text>
+                  <Text
+                    style={[styles.detailValue, { color: theme.colors.text }]}
+                  >
                     ₱{startingPrice?.toLocaleString()}
                   </Text>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Auction Date</Text>
-                  <Text style={styles.detailValue}>{auctionDate}</Text>
+                  <Text
+                    style={[
+                      styles.detailLabel,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Auction Date
+                  </Text>
+                  <Text
+                    style={[styles.detailValue, { color: theme.colors.text }]}
+                  >
+                    {auctionDate}
+                  </Text>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Status</Text>
+                  <Text
+                    style={[
+                      styles.detailLabel,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Status
+                  </Text>
                   <Text
                     style={[
                       styles.detailValue,
@@ -294,22 +361,51 @@ const PlaceBid = ({
             />
 
             {/* Bid Input Section */}
-            <View style={styles.bidSection}>
-              <Text style={styles.bidSectionTitle}>Your Bid Amount</Text>
+            <View
+              style={[
+                styles.bidSection,
+                {
+                  backgroundColor: theme.colors.card,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[styles.bidSectionTitle, { color: theme.colors.text }]}
+              >
+                Your Bid Amount
+              </Text>
 
               {isAuctionActive() ? (
                 <>
-                  <View style={styles.bidInputWrapper}>
-                    <Text style={styles.currencySymbol}>₱</Text>
+                  <View
+                    style={[
+                      styles.bidInputWrapper,
+                      {
+                        backgroundColor: theme.colors.surface,
+                        borderColor: theme.colors.border,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.currencySymbol,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      ₱
+                    </Text>
                     <TextInput
                       style={[
                         styles.bidInput,
-                        isFocused && styles.bidInputFocused,
-                        bidError && styles.bidInputError,
+                        { color: theme.colors.text },
+                        isFocused && { borderColor: theme.colors.primary },
+                        bidError && { borderColor: theme.colors.error },
                       ]}
                       value={bidAmount}
                       onChangeText={handleBidChange}
                       placeholder={getMinimumBid().toLocaleString()}
+                      placeholderTextColor={theme.colors.textTertiary}
                       keyboardType="numeric"
                       onFocus={() => setIsFocused(true)}
                       onBlur={() => setIsFocused(false)}
@@ -317,7 +413,12 @@ const PlaceBid = ({
                     />
                   </View>
 
-                  <Text style={styles.minimumBidNote}>
+                  <Text
+                    style={[
+                      styles.minimumBidNote,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
                     Minimum bid: ₱{getMinimumBid().toLocaleString()}
                   </Text>
 
@@ -332,15 +433,39 @@ const PlaceBid = ({
                     setBidError={setBidError}
                   />
 
-                  {bidError && <Text style={styles.errorText}>{bidError}</Text>}
+                  {bidError && (
+                    <Text
+                      style={[styles.errorText, { color: theme.colors.error }]}
+                    >
+                      {bidError}
+                    </Text>
+                  )}
                 </>
               ) : (
-                <View style={styles.auctionNotActiveCard}>
+                <View
+                  style={[
+                    styles.auctionNotActiveCard,
+                    {
+                      backgroundColor: theme.colors.surface,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
+                >
                   <Text style={styles.auctionNotActiveIcon}>⏰</Text>
-                  <Text style={styles.auctionNotActiveTitle}>
+                  <Text
+                    style={[
+                      styles.auctionNotActiveTitle,
+                      { color: theme.colors.text },
+                    ]}
+                  >
                     Auction Not Started
                   </Text>
-                  <Text style={styles.auctionNotActiveMessage}>
+                  <Text
+                    style={[
+                      styles.auctionNotActiveMessage,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
                     The auction for this stall has not started yet. Come back on{" "}
                     {auctionDate} to place your bid.
                   </Text>
@@ -351,18 +476,42 @@ const PlaceBid = ({
 
           {/* Fixed Bottom Action Buttons */}
           {isAuctionActive() && (
-            <View style={styles.bottomActions}>
+            <View
+              style={[
+                styles.bottomActions,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderTopColor: theme.colors.border,
+                },
+              ]}
+            >
               <TouchableOpacity
-                style={styles.cancelButton}
+                style={[
+                  styles.cancelButton,
+                  { backgroundColor: theme.colors.borderLight },
+                ]}
                 onPress={handleClose}
                 disabled={Boolean(isSubmitting)}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text
+                  style={[
+                    styles.cancelButtonText,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
                   styles.submitButton,
+                  {
+                    backgroundColor:
+                      !bidAmount || bidError || isSubmitting
+                        ? theme.colors.borderLight
+                        : theme.colors.primary,
+                  },
                   (!bidAmount || bidError || isSubmitting) &&
                     styles.submitButtonDisabled,
                 ]}
@@ -372,6 +521,12 @@ const PlaceBid = ({
                 <Text
                   style={[
                     styles.submitButtonText,
+                    {
+                      color:
+                        !bidAmount || bidError || isSubmitting
+                          ? theme.colors.textTertiary
+                          : "#FFFFFF",
+                    },
                     (!bidAmount || bidError || isSubmitting) &&
                       styles.submitButtonTextDisabled,
                   ]}

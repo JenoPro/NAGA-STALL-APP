@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { ScrollView, StyleSheet, Dimensions, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
+import { useTheme } from "../Settings/components/ThemeComponents/ThemeContext";
 import AuctionCard from "./Components/AuctionCardComponents/AuctionCard";
 import SearchFilterBar from "../Stall/components/SearchFilter/SearchFilterBar";
 import AuctionReminderModal from "../Auction/Components/AuctionReminderComponent/AuctionReminderModal";
@@ -82,6 +83,7 @@ const auctionStallsData = [
 ];
 
 const AuctionScreen = () => {
+  const { theme } = useTheme();
   const [showReminder, setShowReminder] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("ALL");
@@ -142,7 +144,9 @@ const AuctionScreen = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
         <AuctionReminderModal
           visible={showReminder}
           onClose={() => setShowReminder(false)}
@@ -164,8 +168,18 @@ const AuctionScreen = () => {
               sortOptions={auctionSortOptions}
             />
             {/* Results Header */}
-            <View style={styles.resultsHeader}>
-              <Text style={styles.resultsText}>
+            <View
+              style={[
+                styles.resultsHeader,
+                { backgroundColor: theme.colors.surface },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.resultsText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
                 {filteredAndSortedStalls.length}{" "}
                 {filteredAndSortedStalls.length === 1 ? "stall" : "stalls"}{" "}
                 available for auction
@@ -206,27 +220,22 @@ const AuctionScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
   },
   titleHeader: {
     paddingHorizontal: width * 0.04,
     paddingTop: 15,
     paddingBottom: 10,
-    backgroundColor: "#FFFFFF",
   },
   headerTitle: {
     fontSize: width * 0.06,
     fontWeight: "bold",
-    color: "#1F2937",
   },
   resultsHeader: {
     paddingHorizontal: width * 0.04,
     paddingVertical: 12,
-    backgroundColor: "#F9FAFB",
   },
   resultsText: {
     fontSize: width * 0.035,
-    color: "#6B7280",
   },
   scrollView: {
     flex: 1,
@@ -239,12 +248,10 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#374151",
     marginBottom: 8,
   },
   noResultsSubtext: {
     fontSize: 14,
-    color: "#6B7280",
     textAlign: "center",
   },
 });

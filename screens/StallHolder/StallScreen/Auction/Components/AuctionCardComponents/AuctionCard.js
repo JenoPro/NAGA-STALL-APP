@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
+import { useTheme } from "../../../Settings/components/ThemeComponents/ThemeContext";
 import PreRegisterModal from "../PreRegisterComponent/PreRegisterModal";
 import PlaceBid from "../PlaceBid/PlaceBid";
 
@@ -9,6 +10,7 @@ const AuctionCard = ({
   isPreRegistered,
   onSubmitBid,
 }) => {
+  const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [showPlaceBid, setShowPlaceBid] = useState(false);
   const [countdown, setCountdown] = useState("");
@@ -145,7 +147,15 @@ const AuctionCard = ({
   };
 
   return (
-    <View style={styles.auctionCard}>
+    <View
+      style={[
+        styles.auctionCard,
+        {
+          backgroundColor: theme.colors.card,
+          borderColor: theme.colors.border,
+        },
+      ]}
+    >
       {/* Stall Image + Badge */}
       <View style={styles.cardHeader}>
         <Image source={{ uri: stall.image }} style={styles.stallImage} />
@@ -157,38 +167,103 @@ const AuctionCard = ({
       {/* Stall Info */}
       <View style={styles.cardContent}>
         <View style={styles.stallInfo}>
-          <View style={styles.stallNumberContainer}>
-            <Text style={styles.stallLabel}>STALL#</Text>
-            <Text style={styles.stallNumber}>{stall.stallNumber}</Text>
+          <View
+            style={[
+              styles.stallNumberContainer,
+              { backgroundColor: theme.colors.accent },
+            ]}
+          >
+            <Text style={[styles.stallLabel, { color: "#FFFFFF" }]}>
+              STALL#
+            </Text>
+            <Text style={[styles.stallNumber, { color: "#FFFFFF" }]}>
+              {stall.stallNumber}
+            </Text>
           </View>
 
-          <View style={styles.locationContainer}>
-            <Text style={styles.locationText}>{stall.location}</Text>
+          <View style={[styles.locationContainer]}>
+            <Text style={[styles.locationText, { color: "#FFFFFF" }]}>
+              {stall.location}
+            </Text>
           </View>
         </View>
 
         {/* Starting Price */}
-        <View style={styles.startingPriceContainer}>
-          <Text style={styles.startingPriceLabel}>Starting Price:</Text>
-          <Text style={styles.startingPriceText}>{stall.price} Php</Text>
+        <View
+          style={[
+            styles.startingPriceContainer,
+            {
+              backgroundColor: theme.colors.primaryLight,
+              borderLeftColor: theme.colors.success,
+            },
+          ]}
+        >
+          <Text
+            style={[styles.startingPriceLabel, { color: theme.colors.success }]}
+          >
+            Starting Price:
+          </Text>
+          <Text
+            style={[styles.startingPriceText, { color: theme.colors.success }]}
+          >
+            {stall.price} Php
+          </Text>
         </View>
 
         {/* Floor + Size */}
         <View style={styles.detailsContainer}>
-          <Text style={styles.floorText}>{stall.floor}</Text>
-          <Text style={styles.sizeText}>{stall.size}</Text>
+          <Text
+            style={[styles.floorText, { color: theme.colors.textSecondary }]}
+          >
+            {stall.floor}
+          </Text>
+          <Text
+            style={[styles.sizeText, { color: theme.colors.textSecondary }]}
+          >
+            {stall.size}
+          </Text>
         </View>
 
         {/* Stall Description */}
-        <View style={styles.stallDescriptionContainer}>
-          <Text style={styles.stallDescriptionLabel}>Stall Description:</Text>
-          <Text style={styles.descriptionText}>{stall.stallDescription}</Text>
+        <View
+          style={[
+            styles.stallDescriptionContainer,
+            { backgroundColor: theme.colors.surface },
+          ]}
+        >
+          <Text
+            style={[
+              styles.stallDescriptionLabel,
+              { color: theme.colors.primary },
+            ]}
+          >
+            Stall Description:
+          </Text>
+          <Text style={[styles.descriptionText, { color: theme.colors.text }]}>
+            {stall.stallDescription}
+          </Text>
         </View>
 
         {/* Auction Date */}
-        <View style={styles.auctionDateContainer}>
-          <Text style={styles.auctionDateLabel}>Auction Date:</Text>
-          <Text style={styles.auctionDateText}>{stall.auctionDate}</Text>
+        <View
+          style={[
+            styles.auctionDateContainer,
+            {
+              backgroundColor: theme.colors.surface,
+              borderLeftColor: theme.colors.primary,
+            },
+          ]}
+        >
+          <Text
+            style={[styles.auctionDateLabel, { color: theme.colors.primary }]}
+          >
+            Auction Date:
+          </Text>
+          <Text
+            style={[styles.auctionDateText, { color: theme.colors.primary }]}
+          >
+            {stall.auctionDate}
+          </Text>
         </View>
 
         {/* Pre-Register Button */}
@@ -196,12 +271,25 @@ const AuctionCard = ({
           style={[
             styles.statusButton,
             styles.preRegisterButton,
+            {
+              backgroundColor: isPreRegistered
+                ? theme.colors.borderLight
+                : theme.colors.primary,
+            },
             isPreRegistered ? styles.disabledButton : null,
           ]}
           onPress={handlePreRegisterPress}
           disabled={isPreRegistered}
         >
-          <Text style={[styles.statusButtonText, styles.preRegisterButtonText]}>
+          <Text
+            style={[
+              styles.statusButtonText,
+              styles.preRegisterButtonText,
+              {
+                color: isPreRegistered ? theme.colors.textTertiary : "#FFFFFF",
+              },
+            ]}
+          >
             {isPreRegistered
               ? "Already pre-registered"
               : "Pre-register for Auction"}
@@ -214,6 +302,11 @@ const AuctionCard = ({
             style={[
               styles.statusButton,
               styles.placeBidButton,
+              {
+                backgroundColor: isAuctionActive()
+                  ? theme.colors.success
+                  : theme.colors.borderLight,
+              },
               !isAuctionActive() && styles.placeBidButtonDisabled,
             ]}
             onPress={handlePlaceBidPress}
@@ -224,6 +317,11 @@ const AuctionCard = ({
                 style={[
                   styles.statusButtonText,
                   styles.placeBidButtonText,
+                  {
+                    color: isAuctionActive()
+                      ? "#FFFFFF"
+                      : theme.colors.textTertiary,
+                  },
                   !isAuctionActive() && styles.placeBidButtonTextDisabled,
                 ]}
               >
@@ -233,6 +331,7 @@ const AuctionCard = ({
                 <Text
                   style={[
                     styles.countdownText,
+                    { color: theme.colors.textTertiary },
                     !isAuctionActive() && styles.countdownTextDisabled,
                   ]}
                 >
