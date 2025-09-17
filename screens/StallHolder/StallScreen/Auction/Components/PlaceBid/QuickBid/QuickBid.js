@@ -5,7 +5,7 @@ import { QuickBidStyles as styles } from "./QuickBidStyles";
 const QuickBid = ({
   bidAmount,
   setBidAmount,
-  getMinimumBid,
+  minimumBid,
   minimumIncrement,
   isSubmitting,
   bidError,
@@ -37,8 +37,7 @@ const QuickBid = ({
     if (onOutbid) {
       onOutbid();
     } else {
-      const minBid = getMinimumBid();
-      setBidAmount(minBid.toString());
+      setBidAmount(minimumBid.toString());
 
       if (bidError && setBidError) {
         setBidError("");
@@ -50,8 +49,7 @@ const QuickBid = ({
     if (onSetMinimum) {
       onSetMinimum();
     } else {
-      const minBid = getMinimumBid();
-      setBidAmount(minBid.toString());
+      setBidAmount(minimumBid.toString());
 
       if (bidError && setBidError) {
         setBidError("");
@@ -83,7 +81,7 @@ const QuickBid = ({
             isSubmitting && styles.disabledButtonSubtext,
           ]}
         >
-          ₱{getMinimumBid().toLocaleString()}
+          ₱{minimumBid.toLocaleString()}
         </Text>
       </TouchableOpacity>
 
