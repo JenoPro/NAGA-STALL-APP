@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -98,6 +97,18 @@ const StallHome = ({ navigation }) => {
     return null;
   };
 
+  // Screens that have their own scrollable components
+  const screensWithOwnScrolling = [
+    "notifications",
+    "raffle",
+    "auction",
+    "stall",
+    "documents",
+  ];
+
+  // Determine if need to wrap in ScrollView
+  const needsScrollView = !screensWithOwnScrolling.includes(currentScreen);
+
   // Render current screen
   const renderCurrentScreen = () => {
     switch (currentScreen) {
@@ -136,13 +147,17 @@ const StallHome = ({ navigation }) => {
         <Header onMenuPress={handleMenuPress} title={getPageTitle()} />
 
         {/* Main Content */}
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {renderCurrentScreen()}
-        </ScrollView>
+        {needsScrollView ? (
+          <ScrollView
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {renderCurrentScreen()}
+          </ScrollView>
+        ) : (
+          <View style={styles.contentView}>{renderCurrentScreen()}</View>
+        )}
 
         {/* Bottom Navigation Component */}
         <Navbar
@@ -176,6 +191,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 20,
     flexGrow: 1,
+  },
+  contentView: {
+    flex: 1,
   },
 });
 

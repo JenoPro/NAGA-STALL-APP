@@ -13,7 +13,7 @@ export const mockUser = {
   // Spouse Information
   spouseName: "Maria Santos Dela Cruz",
   spouseBirthDate: "1996-08-21",
-  spouseEducation: "High School Graduate",
+  spouseEducation: "College Graduate",
   occupation: "Teacher",
   spouseContact: "09987654321",
 

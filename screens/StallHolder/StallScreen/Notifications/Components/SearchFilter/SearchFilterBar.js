@@ -1,34 +1,33 @@
-import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import SearchBar from './SearchBar';
-import FilterButton from './FilterButton';
+import { View, StyleSheet, Dimensions } from "react-native";
+import SearchBar from "./SearchBar";
+import FilterButton from "./FilterButton";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
-const SearchFilterBar = ({ 
-  searchText, 
-  onSearchChange, 
-  selectedFilter, 
-  onFilterSelect, 
-  selectedSort, 
+const SearchFilterBar = ({
+  searchText,
+  onSearchChange,
+  selectedFilter,
+  onFilterSelect,
+  selectedSort,
   onSortSelect,
   searchPlaceholder = "Search notifications...",
-  filters = ['ALL', 'ORDER', 'SYSTEM', 'PROMOTION', 'ANNOUNCEMENT'],
+  filters = ["ALL", "AUCTION", "RAFFLE", "PAYMENT", "SYSTEM", "ANNOUNCEMENT"],
   sortOptions = [
-    { label: 'Newest First', value: 'newest' },
-    { label: 'Oldest First', value: 'oldest' },
-    { label: 'Unread First', value: 'unread' },
-    { label: 'Default', value: 'default' }
-  ]
+    { label: "Newest First", value: "newest" },
+    { label: "Oldest First", value: "oldest" },
+    { label: "Unread First", value: "unread" },
+    { label: "Default", value: "default" },
+  ],
 }) => {
   return (
     <View style={styles.container}>
-      <SearchBar 
+      <SearchBar
         searchText={searchText}
         onSearchChange={onSearchChange}
         placeholder={searchPlaceholder}
       />
-      
+
       <FilterButton
         selectedFilter={selectedFilter}
         onFilterSelect={onFilterSelect}
@@ -43,13 +42,13 @@ const SearchFilterBar = ({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: width * 0.04,
     paddingVertical: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    alignItems: 'center',
+    borderBottomColor: "#e5e7eb",
+    alignItems: "center",
   },
 });
 

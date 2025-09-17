@@ -44,7 +44,7 @@ const InputField = React.memo(function InputField({
           error && styles.inputError,
           !editable && styles.disabledInput,
         ]}
-        value={value}
+        value={value || ""} // Ensure value is never undefined
         onChangeText={editable ? onChangeText : undefined}
         placeholder={placeholder}
         placeholderTextColor="#9ca3af"
@@ -87,29 +87,60 @@ const EditProfileModal = ({ visible, onClose, user, onSave }) => {
   const [errors, setErrors] = useState({});
   const scrollViewRef = useRef(null);
 
+  // Reinitialize formData when user prop changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        fullName: user.fullName || "",
+        birthDate: user.birthDate || "",
+        civilStatus: user.civilStatus || "",
+        education: user.education || "",
+        contactNumber: user.contactNumber || "",
+        mailingAddress: user.mailingAddress || "",
+        emailAddress: user.emailAddress || "",
+        spouseName: user.spouseName || "",
+        spouseBirthDate: user.spouseBirthDate || "",
+        spouseEducation: user.spouseEducation || "",
+        occupation: user.occupation || "",
+        spouseContact: user.spouseContact || "",
+        businessCapitalization: user.businessCapitalization?.toString() || "",
+        sourceOfCapital: user.sourceOfCapital || "",
+        previousBusiness: user.previousBusiness || "",
+        applicantRelative: user.applicantRelative || "",
+      });
+    }
+  }, [user]);
+
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.emailAddress.trim()) {
+
+    // Safe trim function that handles undefined/null values
+    const safeTrim = (value) => (value || "").trim();
+
+    if (!safeTrim(formData.emailAddress)) {
       newErrors.emailAddress = "Email address is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.emailAddress)) {
       newErrors.emailAddress = "Please enter a valid email address";
     }
-    if (!formData.mailingAddress.trim()) {
+
+    if (!safeTrim(formData.mailingAddress)) {
       newErrors.mailingAddress = "Mailing address is required";
     }
+
     if (formData.civilStatus !== "Single") {
-      if (!formData.spouseName.trim())
+      if (!safeTrim(formData.spouseName))
         newErrors.spouseName = "Spouse name is required";
-      if (!formData.spouseBirthDate.trim()) {
+      if (!safeTrim(formData.spouseBirthDate)) {
         newErrors.spouseBirthDate = "Spouse birth date is required";
       }
-      if (!formData.spouseEducation.trim())
+      if (!safeTrim(formData.spouseEducation))
         newErrors.spouseEducation = "Spouse education is required";
-      if (!formData.occupation.trim())
+      if (!safeTrim(formData.occupation))
         newErrors.occupation = "Spouse occupation is required";
-      if (!formData.spouseContact.trim())
+      if (!safeTrim(formData.spouseContact))
         newErrors.spouseContact = "Spouse contact is required";
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -121,8 +152,6 @@ const EditProfileModal = ({ visible, onClose, user, onSave }) => {
     }
     const updatedData = {
       ...formData,
-      age: formData.age ? parseInt(formData.age) : null,
-      spouseAge: formData.spouseAge ? parseInt(formData.spouseAge) : null,
       businessCapitalization: formData.businessCapitalization
         ? parseFloat(formData.businessCapitalization)
         : null,
@@ -133,7 +162,9 @@ const EditProfileModal = ({ visible, onClose, user, onSave }) => {
 
   const handleInputChange = useCallback(
     (field, value) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      // Ensure value is always a string
+      const safeValue = value || "";
+      setFormData((prev) => ({ ...prev, [field]: safeValue }));
       if (errors[field]) {
         setErrors((prev) => ({ ...prev, [field]: null }));
       }
@@ -151,14 +182,14 @@ const EditProfileModal = ({ visible, onClose, user, onSave }) => {
     if (visible && user) {
       setFormData({
         fullName: user?.fullName || "",
-        age: user?.age?.toString() || "",
+        birthDate: user?.birthDate || "",
         civilStatus: user?.civilStatus || "",
         education: user?.education || "",
         contactNumber: user?.contactNumber || "",
         mailingAddress: user?.mailingAddress || "",
         emailAddress: user?.emailAddress || "",
         spouseName: user?.spouseName || "",
-        spouseAge: user?.spouseAge?.toString() || "",
+        spouseBirthDate: user?.spouseBirthDate || "",
         spouseEducation: user?.spouseEducation || "",
         occupation: user?.occupation || "",
         spouseContact: user?.spouseContact || "",
