@@ -13,6 +13,9 @@ import { useTheme } from "../../../Settings/components/ThemeComponents/ThemeCont
 import SubmitBid from "./SuccessModal/SuccessBidModal";
 import HighestBidder from "./HighestBidder/HighestBidder";
 import QuickBid from "./QuickBid/QuickBid";
+import LiveUpdates from "./LiveUpdates/LiveUpdates";
+import CountdownTimer from "./CountdownTimer/CountdownTimer";
+import useAutoRefresh from "./LiveUpdates/useAutoRefresh";
 import { isAuctionActive, getMinimumBid, validateBid } from "./AuctionUtils";
 
 const PlaceBid = ({
@@ -20,12 +23,16 @@ const PlaceBid = ({
   onClose,
   stallNumber,
   auctionDate,
+  auctionEndDate = null,
+  auctionEndTime = "23:59:59",
   location,
   startingPrice,
   currentBid,
   minimumIncrement = 100,
   onSubmitBid,
   currentBidder = null,
+  onRefreshData = null,
+  onBidHistory = null,
 }) => {
   const { theme } = useTheme();
   const [bidAmount, setBidAmount] = useState("");
@@ -33,6 +40,23 @@ const PlaceBid = ({
   const [bidError, setBidError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  // Auto-refresh functionality
+  const { isRefreshing, lastUpdated, refresh } = useAutoRefresh({
+    refreshFunction: onRefreshData,
+    interval: 5000, // 5 seconds
+    enabled: visible && isAuctionActive(auctionDate),
+    dependencies: [visible, stallNumber],
+  });
+
+  // Handle auction end
+  const handleAuctionEnd = () => {
+    if (onRefreshData) {
+      onRefreshData();
+    }
+    // Could also show an alert or notification here
+    console.log(`Auction for Stall #${stallNumber} has ended`);
+  };
 
   const handleSubmitBid = async () => {
     const error = validateBid(
@@ -164,6 +188,25 @@ const PlaceBid = ({
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="interactive"
           >
+            {/* Countdown Timer Component */}
+            <CountdownTimer
+              auctionDurationMinutes={20}
+              onAuctionEnd={handleAuctionEnd}
+              urgentThreshold={300}
+              warningThreshold={600}
+            />
+
+            {/* Live Updates Component */}
+            {isAuctionActive(auctionDate) && (
+              <LiveUpdates
+                onRefresh={refresh}
+                isRefreshing={isRefreshing}
+                lastUpdated={lastUpdated}
+                stallNumber={stallNumber}
+                onBidUpdate={onBidHistory}
+              />
+            )}
+
             {/* Stall Information Card */}
             <View
               style={[
