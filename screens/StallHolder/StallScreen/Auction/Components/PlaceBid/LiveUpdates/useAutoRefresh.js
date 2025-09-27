@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { AuctionTimings } from "../../shared/constants";
 
 const useAutoRefresh = ({
   refreshFunction,
-  interval = 5000,
+  interval = AuctionTimings.AUTO_REFRESH_INTERVAL,
   enabled = true,
   dependencies = [],
   onError = null,

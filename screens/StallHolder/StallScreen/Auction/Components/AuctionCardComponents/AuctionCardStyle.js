@@ -13,7 +13,6 @@ export const AuctionCardStyles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     overflow: "hidden",
-    borderWidth: 2,
   },
   cardHeader: {
     position: "relative",
@@ -99,7 +98,7 @@ export const AuctionCardStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 12, // Consistent spacing
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 4,
@@ -124,22 +123,24 @@ export const AuctionCardStyles = StyleSheet.create({
     fontSize: 14,
   },
   stallDescriptionContainer: {
-    padding: 10,
-    borderRadius: 7,
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 15,
   },
-  descriptionText: {
-    fontSize: 14,
-  },
   stallDescriptionLabel: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  descriptionText: {
+    fontSize: 15,
+    lineHeight: 22,
   },
   auctionDateContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    padding: 12,
     borderRadius: 8,
     marginBottom: 15,
     borderLeftWidth: 4,
@@ -147,10 +148,13 @@ export const AuctionCardStyles = StyleSheet.create({
   auctionDateLabel: {
     fontSize: 12,
     fontWeight: "600",
+    marginBottom: 4,
   },
   auctionDateText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
+    lineHeight: 18,
+    flexWrap: "wrap",
   },
   statusButton: {
     paddingVertical: 12,
@@ -166,20 +170,35 @@ export const AuctionCardStyles = StyleSheet.create({
     marginBottom: 10,
   },
   preRegisterButtonText: {},
-  placeBidButton: {},
-  placeBidButtonDisabled: {},
-  placeBidButtonText: {},
-  placeBidButtonTextDisabled: {},
+  placeBidButton: {
+    marginTop: 5,
+    marginBottom: 5,
+  },
+  placeBidButtonDisabled: {
+    opacity: 0.6,
+  },
+  placeBidButtonText: {
+    textAlign: "center",
+  },
+  placeBidButtonTextDisabled: {
+    fontWeight: "500",
+  },
   buttonContent: {
     alignItems: "center",
     justifyContent: "center",
+    minHeight: 20,
+    paddingVertical: 2,
   },
   countdownText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     marginTop: 4,
+    textAlign: "center",
+    fontStyle: "italic",
   },
-  countdownTextDisabled: {},
+  countdownTextDisabled: {
+    opacity: 0.7,
+  },
   disabledButton: {
     opacity: 0.7,
   },

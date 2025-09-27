@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,15 +16,20 @@ import QuickBid from "./QuickBid/QuickBid";
 import LiveUpdates from "./LiveUpdates/LiveUpdates";
 import CountdownTimer from "./CountdownTimer/CountdownTimer";
 import useAutoRefresh from "./LiveUpdates/useAutoRefresh";
-import { isAuctionActive, getMinimumBid, validateBid } from "./AuctionUtils";
+import {
+  isAuctionActive,
+  getMinimumBid,
+  validateBid,
+  hasAuctionStarted,
+} from "./AuctionUtils";
+import { AuctionTimings } from "../shared/constants";
 
 const PlaceBid = ({
   visible,
   onClose,
   stallNumber,
   auctionDate,
-  auctionEndDate = null,
-  auctionEndTime = "23:59:59",
+  startTime,
   location,
   startingPrice,
   currentBid,
@@ -40,12 +45,29 @@ const PlaceBid = ({
   const [bidError, setBidError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [auctionStarted, setAuctionStarted] = useState(false);
+
+  // Monitor auction start status
+  useEffect(() => {
+    const checkAuctionStart = () => {
+      const started = hasAuctionStarted(auctionDate, startTime);
+      setAuctionStarted(started);
+    };
+
+    // Check immediately
+    checkAuctionStart();
+
+    // Check every second
+    const statusInterval = setInterval(checkAuctionStart, 1000);
+
+    return () => clearInterval(statusInterval);
+  }, [auctionDate, startTime]);
 
   // Auto-refresh functionality
   const { isRefreshing, lastUpdated, refresh } = useAutoRefresh({
     refreshFunction: onRefreshData,
-    interval: 5000, // 5 seconds
-    enabled: visible && isAuctionActive(auctionDate),
+    interval: AuctionTimings.AUTO_REFRESH_INTERVAL,
+    enabled: visible && isAuctionActive(auctionDate, startTime),
     dependencies: [visible, stallNumber],
   });
 
@@ -54,11 +76,16 @@ const PlaceBid = ({
     if (onRefreshData) {
       onRefreshData();
     }
-    // Could also show an alert or notification here
-    console.log(`Auction for Stall #${stallNumber} has ended`);
+    // TODO: Show auction ended notification to user
   };
 
   const handleSubmitBid = async () => {
+    // Check if auction has started before validating bid
+    if (!auctionStarted) {
+      setBidError("Auction has not started yet");
+      return;
+    }
+
     const error = validateBid(
       bidAmount,
       currentBid,
@@ -71,7 +98,7 @@ const PlaceBid = ({
     }
 
     // Check if auction is still active before submitting
-    if (!isAuctionActive(auctionDate)) {
+    if (!isAuctionActive(auctionDate, startTime)) {
       setBidError("Auction is not currently active");
       return;
     }
@@ -124,6 +151,7 @@ const PlaceBid = ({
     setBidError("");
     setIsSuccess(false);
     setIsFocused(false);
+    setAuctionStarted(false);
     onClose();
   };
 
@@ -133,6 +161,7 @@ const PlaceBid = ({
     setBidAmount("");
     setBidError("");
     setIsFocused(false);
+    // Don't reset auctionStarted here as auction should still be active
   };
 
   // Success view use SubmitBid component
@@ -194,10 +223,12 @@ const PlaceBid = ({
               onAuctionEnd={handleAuctionEnd}
               urgentThreshold={300}
               warningThreshold={600}
+              auctionDate={auctionDate}
+              startTime={startTime}
             />
 
             {/* Live Updates Component */}
-            {isAuctionActive(auctionDate) && (
+            {auctionStarted && (
               <LiveUpdates
                 onRefresh={refresh}
                 isRefreshing={isRefreshing}
@@ -273,7 +304,7 @@ const PlaceBid = ({
                   <Text
                     style={[styles.detailValue, { color: theme.colors.text }]}
                   >
-                    {auctionDate}
+                    {auctionDate} at {startTime}
                   </Text>
                 </View>
 
@@ -290,13 +321,11 @@ const PlaceBid = ({
                     style={[
                       styles.detailValue,
                       {
-                        color: isAuctionActive(auctionDate)
-                          ? "#10B981"
-                          : "#F59E0B",
+                        color: auctionStarted ? "#10B981" : "#F59E0B",
                       },
                     ]}
                   >
-                    {isAuctionActive(auctionDate) ? "Live Auction" : "Upcoming"}
+                    {auctionStarted ? "Live Auction" : "Auction Starts Soon"}
                   </Text>
                 </View>
               </View>
@@ -325,7 +354,7 @@ const PlaceBid = ({
                 Your Bid Amount
               </Text>
 
-              {isAuctionActive(auctionDate) ? (
+              {auctionStarted ? (
                 <>
                   <View
                     style={[
@@ -428,16 +457,17 @@ const PlaceBid = ({
                       { color: theme.colors.textSecondary },
                     ]}
                   >
-                    The auction for this stall has not started yet. Come back on{" "}
-                    {auctionDate} to place your bid.
+                    The auction for this stall has not started yet. Bidding will
+                    be enabled when the auction begins on {auctionDate} at{" "}
+                    {startTime}.
                   </Text>
                 </View>
               )}
             </View>
           </ScrollView>
 
-          {/* Fixed Bottom Action Buttons */}
-          {isAuctionActive(auctionDate) && (
+          {/* Bottom Action Buttons */}
+          {auctionStarted && (
             <View
               style={[
                 styles.bottomActions,

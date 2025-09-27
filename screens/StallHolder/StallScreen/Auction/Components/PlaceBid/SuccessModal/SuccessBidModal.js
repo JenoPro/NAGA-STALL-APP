@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { View, Text, Modal } from "react-native";
+import { SuccessModalStyles as styles } from "../../shared/ModalStyles";
+import { AuctionTimings } from "../../shared/constants";
 
 const SubmitBid = ({ visible, onClose }) => {
   useEffect(() => {
     if (visible === true) {
       const timer = setTimeout(() => {
         onClose();
-      }, 2000);
+      }, AuctionTimings.SUCCESS_MODAL_TIMEOUT);
 
       return () => clearTimeout(timer);
     }
@@ -38,7 +40,5 @@ const SubmitBid = ({ visible, onClose }) => {
     </Modal>
   );
 };
-
-import { SubmitBidStyles as styles } from "./SuccessBidModalStyles";
 
 export default SubmitBid;

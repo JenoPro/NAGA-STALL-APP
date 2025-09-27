@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { View, Text, TouchableOpacity, Animated } from "react-native";
 import { useTheme } from "../../../../Settings/components/ThemeComponents/ThemeContext";
 import { LiveUpdatesStyles as styles } from "./LiveUpdatesStyles";
+import { AuctionTimings } from "../../shared/constants";
 
 const LiveUpdates = ({
   onRefresh,
   isRefreshing = false,
   lastUpdated = null,
-  autoRefreshInterval = 5000,
+  autoRefreshInterval = AuctionTimings.AUTO_REFRESH_INTERVAL,
   enableAutoRefresh = true,
   stallNumber,
   onBidUpdate = null,
@@ -76,22 +77,6 @@ const LiveUpdates = ({
     return () => pulseAnimation.stop();
   }, []);
 
-  // Rotation animation for refresh icon
-  useEffect(() => {
-    if (isRefreshing) {
-      const rotateAnimation = Animated.loop(
-        Animated.timing(rotateAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        })
-      );
-      rotateAnimation.start();
-    } else {
-      rotateAnim.setValue(0);
-    }
-  }, [isRefreshing]);
-
   const handleManualRefresh = () => {
     if (onRefresh && !isRefreshing) {
       onRefresh();
@@ -121,11 +106,6 @@ const LiveUpdates = ({
       return `${hours}h ago`;
     }
   };
-
-  const spin = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
 
   return (
     <View

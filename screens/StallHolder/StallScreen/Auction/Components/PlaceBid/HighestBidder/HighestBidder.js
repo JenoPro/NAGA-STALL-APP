@@ -6,7 +6,6 @@ const HighestBidder = ({
   currentBid,
   currentBidder = null,
   showLiveBadge = true,
-  useFallbackData = true,
 }) => {
   const { theme } = useTheme();
   const getFallbackBidder = () => {
@@ -64,52 +63,8 @@ const HighestBidder = ({
     return null;
   }
 
-  // Use actual bidder data if available, otherwise use fallback (if enabled)
-  const bidderData =
-    currentBidder || (useFallbackData ? getFallbackBidder() : null);
-
-  // If no bidder data and fallback is disabled, don't show bidder info
-  if (!bidderData) {
-    return (
-      <View
-        style={[
-          styles.currentBidCard,
-          {
-            backgroundColor: theme.colors.card,
-            borderColor: theme.colors.border,
-          },
-        ]}
-      >
-        <View style={styles.currentBidHeader}>
-          <Text
-            style={[
-              styles.currentBidLabel,
-              { color: theme.colors.textSecondary },
-            ]}
-          >
-            Current Highest Bid
-          </Text>
-          {showLiveBadge && (
-            <View style={styles.liveBadge}>
-              <Text style={styles.liveBadgeText}>LIVE</Text>
-            </View>
-          )}
-        </View>
-
-        <Text
-          style={[styles.currentBidAmount, { color: theme.colors.primary }]}
-        >
-          ₱{currentBid.toLocaleString()}
-        </Text>
-
-        <Text
-          style={[styles.currentBidNote, { color: theme.colors.textSecondary }]}
-        >
-          You need to bid higher than this amount to become the leading bidder
-        </Text>
-      </View>
-    );
-  }
+  // Use actual bidder data if available, otherwise use fallback
+  const bidderData = currentBidder || getFallbackBidder();
 
   return (
     <View

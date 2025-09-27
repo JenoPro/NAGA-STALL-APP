@@ -10,51 +10,33 @@ const QuickBid = ({
   isSubmitting,
   bidError,
   setBidError,
-  onQuickBid,
-  onOutbid,
-  onSetMinimum,
 }) => {
   const { theme } = useTheme();
   const quickBidIncrements = [100, 500, 1000];
 
+  // Clear errors helper
+  const clearErrors = () => {
+    if (bidError && setBidError) {
+      setBidError("");
+    }
+  };
+
   // Quick bid functions
   const handleQuickBid = (increment) => {
-    if (onQuickBid) {
-      onQuickBid(increment);
-    } else {
-      const currentAmount = parseFloat(bidAmount) || 0;
-      const newAmount = currentAmount + increment;
-      setBidAmount(newAmount.toString());
-
-      // Clear any existing errors
-      if (bidError && setBidError) {
-        setBidError("");
-      }
-    }
+    const currentAmount = parseFloat(bidAmount) || 0;
+    const newAmount = currentAmount + increment;
+    setBidAmount(newAmount.toString());
+    clearErrors();
   };
 
   const handleOutbid = () => {
-    if (onOutbid) {
-      onOutbid();
-    } else {
-      setBidAmount(minimumBid.toString());
-
-      if (bidError && setBidError) {
-        setBidError("");
-      }
-    }
+    setBidAmount(minimumBid.toString());
+    clearErrors();
   };
 
   const handleSetMinimum = () => {
-    if (onSetMinimum) {
-      onSetMinimum();
-    } else {
-      setBidAmount(minimumBid.toString());
-
-      if (bidError && setBidError) {
-        setBidError("");
-      }
-    }
+    setBidAmount(minimumBid.toString());
+    clearErrors();
   };
 
   return (

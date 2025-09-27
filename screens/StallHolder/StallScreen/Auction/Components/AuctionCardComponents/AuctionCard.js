@@ -3,6 +3,11 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import { useTheme } from "../../../Settings/components/ThemeComponents/ThemeContext";
 import PreRegisterModal from "../PreRegisterComponent/PreRegisterModal";
 import PlaceBid from "../PlaceBid/PlaceBid";
+import {
+  isAuctionActive,
+  calculateAuctionCountdown,
+} from "../PlaceBid/AuctionUtils";
+import { AuctionTimings } from "../shared/constants";
 
 const AuctionCard = ({
   stall,
@@ -15,108 +20,23 @@ const AuctionCard = ({
   const [showPlaceBid, setShowPlaceBid] = useState(false);
   const [countdown, setCountdown] = useState("");
 
-  // Helper function to convert month name to number
-  const getMonthNumber = (monthName) => {
-    const months = {
-      January: 0,
-      February: 1,
-      March: 2,
-      April: 3,
-      May: 4,
-      June: 5,
-      July: 6,
-      August: 7,
-      September: 8,
-      October: 9,
-      November: 10,
-      December: 11,
-    };
-    return months[monthName] || 0;
-  };
-
-  // auction active check with better date parsing
-  const isAuctionActive = () => {
-    const now = new Date();
-
-    let auctionDay;
-    try {
-      auctionDay = new Date(stall.auctionDate);
-
-      // If parsing fails, try manual parsing
-      if (isNaN(auctionDay.getTime())) {
-        const dateParts = stall.auctionDate.split(" ");
-        if (dateParts.length === 3) {
-          const month = dateParts[0];
-          const day = parseInt(dateParts[1].replace(",", ""));
-          const year = parseInt(dateParts[2]);
-          auctionDay = new Date(year, getMonthNumber(month), day);
-        }
-      }
-    } catch (error) {
-      return false;
-    }
-
-    // Set auction time to start of day for comparison
-    auctionDay.setHours(0, 0, 0, 0);
-    now.setHours(0, 0, 0, 0);
-
-    return now >= auctionDay;
-  };
-
-  // Calculate countdown to auction
-  const calculateCountdown = () => {
-    const now = new Date();
-
-    // Use the same date parsing logic as isAuctionActive
-    let auctionDay;
-    try {
-      auctionDay = new Date(stall.auctionDate);
-
-      if (isNaN(auctionDay.getTime())) {
-        const dateParts = stall.auctionDate.split(" ");
-        if (dateParts.length === 3) {
-          const month = dateParts[0];
-          const day = parseInt(dateParts[1].replace(",", ""));
-          const year = parseInt(dateParts[2]);
-          auctionDay = new Date(year, getMonthNumber(month), day);
-        }
-      }
-    } catch (error) {
-      return "";
-    }
-
-    // If auction has started, return empty string
-    if (now >= auctionDay) {
-      return "";
-    }
-
-    const diff = auctionDay.getTime() - now.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) {
-      return `${days}d ${hours}h ${minutes}m`;
-    } else if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else if (minutes > 0) {
-      return `${minutes}m`;
-    } else {
-      return "Starting soon...";
-    }
-  };
-
   useEffect(() => {
     const updateCountdown = () => {
-      const newCountdown = calculateCountdown();
+      const newCountdown = calculateAuctionCountdown(
+        stall.auctionDate,
+        stall.startTime
+      );
       setCountdown(newCountdown);
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 30000);
+    const interval = setInterval(
+      updateCountdown,
+      AuctionTimings.COUNTDOWN_UPDATE_INTERVAL
+    );
 
     return () => clearInterval(interval);
-  }, [stall.auctionDate]);
+  }, [stall.auctionDate, stall.startTime]);
 
   const handlePreRegisterPress = () => {
     onPreRegister(stall.id);
@@ -244,25 +164,25 @@ const AuctionCard = ({
           </Text>
         </View>
 
-        {/* Auction Date */}
+        {/* Auction Date & Time */}
         <View
           style={[
             styles.auctionDateContainer,
             {
               backgroundColor: theme.colors.surface,
-              borderLeftColor: theme.colors.primary,
+              borderLeftColor: theme.colors.success,
             },
           ]}
         >
           <Text
-            style={[styles.auctionDateLabel, { color: theme.colors.primary }]}
+            style={[styles.auctionDateLabel, { color: theme.colors.success }]}
           >
-            Auction Date:
+            Auction Date & Time:
           </Text>
           <Text
-            style={[styles.auctionDateText, { color: theme.colors.primary }]}
+            style={[styles.auctionDateText, { color: theme.colors.success }]}
           >
-            {stall.auctionDate}
+            {stall.auctionDate} at {stall.startTime}
           </Text>
         </View>
 
@@ -303,14 +223,18 @@ const AuctionCard = ({
               styles.statusButton,
               styles.placeBidButton,
               {
-                backgroundColor: isAuctionActive()
+                backgroundColor: isAuctionActive(
+                  stall.auctionDate,
+                  stall.startTime
+                )
                   ? theme.colors.success
                   : theme.colors.borderLight,
               },
-              !isAuctionActive() && styles.placeBidButtonDisabled,
+              !isAuctionActive(stall.auctionDate, stall.startTime) &&
+                styles.placeBidButtonDisabled,
             ]}
             onPress={handlePlaceBidPress}
-            disabled={!isAuctionActive()}
+            disabled={!isAuctionActive(stall.auctionDate, stall.startTime)}
           >
             <View style={styles.buttonContent}>
               <Text
@@ -318,36 +242,43 @@ const AuctionCard = ({
                   styles.statusButtonText,
                   styles.placeBidButtonText,
                   {
-                    color: isAuctionActive()
+                    color: isAuctionActive(stall.auctionDate, stall.startTime)
                       ? "#FFFFFF"
                       : theme.colors.textTertiary,
                   },
-                  !isAuctionActive() && styles.placeBidButtonTextDisabled,
+                  !isAuctionActive(stall.auctionDate, stall.startTime) &&
+                    styles.placeBidButtonTextDisabled,
                 ]}
               >
-                {isAuctionActive() ? "Place Bid" : "Auction Starts"}
+                {isAuctionActive(stall.auctionDate, stall.startTime)
+                  ? "Place Bid"
+                  : "Auction Starts"}
               </Text>
-              {!isAuctionActive() && countdown && (
-                <Text
-                  style={[
-                    styles.countdownText,
-                    { color: theme.colors.textTertiary },
-                    !isAuctionActive() && styles.countdownTextDisabled,
-                  ]}
-                >
-                  {countdown}
-                </Text>
-              )}
-              {!isAuctionActive() && !countdown && (
-                <Text
-                  style={[
-                    styles.countdownText,
-                    !isAuctionActive() && styles.countdownTextDisabled,
-                  ]}
-                >
-                  {stall.auctionDate}
-                </Text>
-              )}
+              {!isAuctionActive(stall.auctionDate, stall.startTime) &&
+                countdown && (
+                  <Text
+                    style={[
+                      styles.countdownText,
+                      { color: theme.colors.textTertiary },
+                      !isAuctionActive(stall.auctionDate, stall.startTime) &&
+                        styles.countdownTextDisabled,
+                    ]}
+                  >
+                    {countdown}
+                  </Text>
+                )}
+              {!isAuctionActive(stall.auctionDate, stall.startTime) &&
+                !countdown && (
+                  <Text
+                    style={[
+                      styles.countdownText,
+                      !isAuctionActive(stall.auctionDate, stall.startTime) &&
+                        styles.countdownTextDisabled,
+                    ]}
+                  >
+                    {stall.auctionDate} at {stall.startTime}
+                  </Text>
+                )}
             </View>
           </TouchableOpacity>
         )}
@@ -359,6 +290,7 @@ const AuctionCard = ({
         onClose={handleModalClose}
         stallNumber={stall.stallNumber}
         auctionDate={stall.auctionDate}
+        startTime={stall.startTime}
         location={stall.location}
       />
 
@@ -368,6 +300,7 @@ const AuctionCard = ({
         onClose={handlePlaceBidClose}
         stallNumber={stall.stallNumber}
         auctionDate={stall.auctionDate}
+        startTime={stall.startTime}
         location={stall.location}
         startingPrice={
           stall.priceValue || parseInt(stall.price.replace(/,/g, ""))

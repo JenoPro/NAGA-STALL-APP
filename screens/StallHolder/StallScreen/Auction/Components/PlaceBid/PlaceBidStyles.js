@@ -1,4 +1,10 @@
 import { StyleSheet, Dimensions, StatusBar } from "react-native";
+import {
+  AuctionColors,
+  AuctionDimensions,
+  AuctionFontSizes,
+} from "../shared/constants";
+
 const { width, height } = Dimensions.get("window");
 
 export const PlaceBidStyles = StyleSheet.create({
@@ -37,7 +43,7 @@ export const PlaceBidStyles = StyleSheet.create({
     flex: 1,
   },
   scrollContentContainer: {
-    paddingBottom: 120,
+    paddingBottom: 15,
     flexGrow: 1,
   },
 
@@ -230,7 +236,7 @@ export const PlaceBidStyles = StyleSheet.create({
   // Bid Section
   bidSection: {
     marginHorizontal: 20,
-    marginBottom: 100,
+    marginBottom: 20,
     borderRadius: 16,
     borderWidth: 1,
     padding: 20,

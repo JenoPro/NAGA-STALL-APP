@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ScrollView, StyleSheet, Dimensions, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -6,6 +6,7 @@ import { useTheme } from "../Settings/components/ThemeComponents/ThemeContext";
 import AuctionCard from "./Components/AuctionCardComponents/AuctionCard";
 import SearchFilterBar from "../Stall/components/SearchFilter/SearchFilterBar";
 import AuctionReminderModal from "../Auction/Components/AuctionReminderComponent/AuctionReminderModal";
+import { AuctionTimings } from "./Components/shared/constants";
 
 const { width } = Dimensions.get("window");
 
@@ -16,7 +17,7 @@ const auctionStallsData = [
     stallNumber: "50",
     price: "2,100",
     priceValue: 2100,
-    currentBid: 2350,
+    currentBid: 2400,
     currentBidder: {
       name: "Juan D.",
       avatar: "👨‍💼",
@@ -28,7 +29,8 @@ const auctionStallsData = [
     floor: "2nd Floor / Grocery Section",
     size: "3x1 meters",
     status: "available",
-    auctionDate: "September 26, 2025",
+    auctionDate: "September 27, 2025",
+    startTime: "1:10 PM",
     image:
       "https://i.pinimg.com/originals/b8/7f/96/b87f9661d0f56d6d88c8e1462e4c68a3.jpg",
     stallDescription:
@@ -52,6 +54,7 @@ const auctionStallsData = [
     size: "3x3 meters",
     status: "available",
     auctionDate: "September 28, 2025",
+    startTime: "2:00 PM",
     image:
       "https://cdn.broadsheet.com.au/sydney/images/2016/08/12/113402-542-cfe6bf07de43630928ce9225de88c1eb.jpg",
     stallDescription:
@@ -75,6 +78,7 @@ const auctionStallsData = [
     size: "4x3 meters",
     status: "available",
     auctionDate: "September 29, 2025",
+    startTime: "12:00 PM",
     image:
       "https://i.pinimg.com/originals/60/17/ec/6017ec3acc17f3e0d729d882026f92eb.jpg",
     stallDescription:
@@ -90,11 +94,22 @@ const AuctionScreen = () => {
   const [selectedSort, setSelectedSort] = useState("default");
 
   const [preRegisteredStalls, setPreRegisteredStalls] = useState([]);
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+
   const handlePreRegister = (stallId) => {
     setPreRegisteredStalls((prev) =>
       prev.includes(stallId) ? prev : [...prev, stallId]
     );
   };
+
+  // Auto-refresh every 5 seconds to update auction status
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      setLastRefresh(new Date());
+    }, AuctionTimings.AUTO_REFRESH_INTERVAL);
+
+    return () => clearInterval(refreshInterval);
+  }, []);
 
   const auctionFilters = ["ALL", "PRE-REGISTERED"];
 
@@ -174,21 +189,31 @@ const AuctionScreen = () => {
                 { backgroundColor: theme.colors.surface },
               ]}
             >
-              <Text
-                style={[
-                  styles.resultsText,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                {filteredAndSortedStalls.length}{" "}
-                {filteredAndSortedStalls.length === 1 ? "stall" : "stalls"}{" "}
-                available for auction
-              </Text>
+              <View style={styles.resultsContent}>
+                <Text
+                  style={[
+                    styles.resultsText,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  {filteredAndSortedStalls.length}{" "}
+                  {filteredAndSortedStalls.length === 1 ? "stall" : "stalls"}{" "}
+                  available for auction
+                </Text>
+                <View style={styles.refreshIndicator}>
+                  <Text
+                    style={[styles.liveText, { color: theme.colors.primary }]}
+                  >
+                    Auto-refreshes for updates
+                  </Text>
+                </View>
+              </View>
             </View>
 
             {/* Stalls List */}
             <ScrollView
               style={styles.scrollView}
+              contentContainerStyle={styles.scrollViewContent}
               showsVerticalScrollIndicator={false}
             >
               {/* Auction Cards */}
@@ -234,12 +259,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.04,
     paddingVertical: 12,
   },
+  resultsContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   resultsText: {
     fontSize: width * 0.035,
   },
+  refreshIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  liveText: {
+    fontSize: width * 0.032,
+    fontWeight: "500",
+    fontStyle: "italic",
+    opacity: 0.8,
+  },
   scrollView: {
     flex: 1,
+  },
+  scrollViewContent: {
     paddingHorizontal: width * 0.04,
+    paddingTop: 15,
+    paddingBottom: 10,
   },
   noResults: {
     alignItems: "center",

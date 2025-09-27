@@ -1,24 +1,19 @@
 import { useEffect, useState, useRef } from "react";
 import { View, Text, Animated } from "react-native";
 import { useTheme } from "../../../../Settings/components/ThemeComponents/ThemeContext";
+import { hasAuctionStarted, getTimeUntilAuctionStart } from "../AuctionUtils";
 import { CountdownTimerStyles as styles } from "./CountdownTimerStyles";
+import { AuctionTimings } from "../../shared/constants";
 
 const CountdownTimer = ({
   auctionDurationMinutes = 20,
   onAuctionEnd = null,
-  showMilliseconds = false,
-  urgentThreshold = 300,
-  warningThreshold = 600,
+  urgentThreshold = AuctionTimings.URGENT_THRESHOLD,
+  warningThreshold = AuctionTimings.WARNING_THRESHOLD,
+  auctionDate = null,
+  startTime = null,
 }) => {
   const { theme } = useTheme();
-
-  // Debug logging
-  console.log("CountdownTimer received props:", {
-    auctionDurationMinutes,
-    showMilliseconds,
-    urgentThreshold,
-    warningThreshold,
-  });
 
   // Initialize with the countdown duration
   const [timeLeft, setTimeLeft] = useState(() => {
@@ -38,6 +33,8 @@ const CountdownTimer = ({
   const [isUrgent, setIsUrgent] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
   const [hasEnded, setHasEnded] = useState(false);
+  const [isFrozen, setIsFrozen] = useState(false);
+  const [timeUntilStart, setTimeUntilStart] = useState(0);
 
   const urgentPulse = useRef(new Animated.Value(1)).current;
   const warningPulse = useRef(new Animated.Value(1)).current;
@@ -68,8 +65,51 @@ const CountdownTimer = ({
     };
   };
 
+  // Check if auction has started and update frozen state
+  useEffect(() => {
+    const checkAuctionStatus = () => {
+      const auctionStarted = hasAuctionStarted(auctionDate, startTime);
+      setIsFrozen(!auctionStarted);
+
+      if (!auctionStarted) {
+        const timeUntil = getTimeUntilAuctionStart(auctionDate, startTime);
+        setTimeUntilStart(timeUntil);
+      }
+    };
+
+    checkAuctionStatus();
+
+    // Check every second if auction hasn't started
+    const statusTimer = setInterval(checkAuctionStatus, 1000);
+
+    return () => clearInterval(statusTimer);
+  }, [auctionDate, startTime]);
+
+  // Reset timer when auction starts (unfreezes)
+  useEffect(() => {
+    if (!isFrozen && timeLeft.total === 0) {
+      // Reset timer to full duration when auction starts
+      const totalSeconds = auctionDurationMinutes * 60;
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      setTimeLeft({
+        hours,
+        minutes,
+        seconds,
+        milliseconds: 0,
+        total: totalSeconds,
+      });
+    }
+  }, [isFrozen, auctionDurationMinutes]);
+
   // Update timer every second
   useEffect(() => {
+    if (isFrozen) {
+      return; // Don't start countdown timer if auction hasn't started
+    }
+
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         const newTimeLeft = decrementTimer(prevTime);
@@ -96,7 +136,7 @@ const CountdownTimer = ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [urgentThreshold, warningThreshold, onAuctionEnd, hasEnded]);
+  }, [urgentThreshold, warningThreshold, onAuctionEnd, hasEnded, isFrozen]);
 
   // Set initial urgency states
   useEffect(() => {
@@ -169,6 +209,7 @@ const CountdownTimer = ({
 
   const getTimerColor = () => {
     if (hasEnded) return "#6B7280";
+    if (isFrozen) return "#F59E0B";
     if (isUrgent) return "#EF4444";
     if (isWarning) return "#F59E0B";
     return theme.colors.primary;
@@ -176,6 +217,7 @@ const CountdownTimer = ({
 
   const getBackgroundColor = () => {
     if (hasEnded) return theme.colors.borderLight;
+    if (isFrozen) return "#FEF3C7";
     if (isUrgent) return "#FEE2E2";
     if (isWarning) return "#FEF3C7";
     return theme.colors.primaryLight;
@@ -183,9 +225,24 @@ const CountdownTimer = ({
 
   const getStatusText = () => {
     if (hasEnded) return "AUCTION ENDED";
+    if (isFrozen) return "WAITING FOR AUCTION START";
     if (isUrgent) return "CLOSING SOON!";
     if (isWarning) return "ENDING SOON";
     return "TIME REMAINING";
+  };
+
+  const formatTimeUntilStart = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      return `${remainingSeconds}s`;
+    }
   };
 
   const AnimatedContainer = isUrgent
@@ -269,6 +326,8 @@ const CountdownTimer = ({
       <Text style={[styles.endTimeText, { color: theme.colors.textTertiary }]}>
         {hasEnded
           ? "Auction has ended"
+          : isFrozen
+          ? `Auction starts in: ${formatTimeUntilStart(timeUntilStart)}`
           : `Auction Duration: ${auctionDurationMinutes} minutes`}
       </Text>
     </AnimatedContainer>

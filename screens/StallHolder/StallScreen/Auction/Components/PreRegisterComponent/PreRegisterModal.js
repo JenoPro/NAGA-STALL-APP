@@ -1,10 +1,12 @@
 import { View, Text, TouchableOpacity, Modal } from "react-native";
+import { PreRegisterModalStyles as styles } from "../shared/ModalStyles";
 
 const PreRegisterModal = ({
   visible,
   onClose,
   stallNumber,
   auctionDate,
+  startTime,
   location,
   auctionType = "Online Auction",
 }) => {
@@ -48,6 +50,11 @@ const PreRegisterModal = ({
             </View>
 
             <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Start Time:</Text>
+              <Text style={styles.detailValue}>{startTime}</Text>
+            </View>
+
+            <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Auction Type:</Text>
               <Text style={styles.detailValue}>{auctionType}</Text>
             </View>
@@ -79,7 +86,5 @@ const PreRegisterModal = ({
     </Modal>
   );
 };
-
-import { PreRegisterStyles as styles } from "../PreRegisterComponent/PreRegisterStyles";
 
 export default PreRegisterModal;
