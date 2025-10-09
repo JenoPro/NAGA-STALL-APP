@@ -1,91 +1,227 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
+  View,
+  Text,
+  Alert,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 // Import components
-import SearchFilterBar from './components/SearchFilter/SearchFilterBar'; // Updated import
+import SearchFilterBar from './components/SearchFilter/SearchFilterBar';
 import StallCard from './components/StallCard';
 
-const { width } = Dimensions.get('window');
+// Import services
+import ApiService from '../../../../services/ApiService';
+import UserStorageService from '../../../../services/UserStorageService';
 
-// Sample stall data
-const stallsData = [
-  {
-    id: 1,
-    stallNumber: '01',
-    price: '1,500',
-    priceValue: 1500,
-    location: 'NCPM',
-    floor: '2nd Floor / Grocery Section',
-    size: '3x3 meters',
-    status: 'available',
-    image: 'https://i.pinimg.com/originals/60/17/ec/6017ec3acc17f3e0d729d882026f92eb.jpg',
-  },
-  {
-    id: 2,
-    stallNumber: '50',
-    price: '2,500',
-    priceValue: 2500,
-    location: 'SATELLITE MARKET',
-    floor: '2nd Floor / Grocery Section',
-    size: '3x3 meters',
-    status: 'locked',
-    image: 'https://i.pinimg.com/originals/b8/7f/96/b87f9661d0f56d6d88c8e1462e4c68a3.jpg',
-  },
-  {
-    id: 3,
-    stallNumber: '30',
-    price: '2,500',
-    priceValue: 2500,
-    location: 'NCPM',
-    floor: '2nd Floor / Grocery Section',
-    size: '3x3 meters',
-    status: 'raffle',
-    image: 'https://www.willflyforfood.net/wp-content/uploads/2023/05/bangkok-markets-indy-market3.jpg',
-  },
-  {
-    id: 4,
-    stallNumber: '32',
-    price: '2,500',
-    priceValue: 2500,
-    location: 'SATELLITE MARKET',
-    floor: 'Ground Floor / Main Section',
-    size: '3x3 meters',
-    status: 'applied',
-    image: 'https://cdn.broadsheet.com.au/sydney/images/2016/08/12/113402-542-cfe6bf07de43630928ce9225de88c1eb.jpg',
-  },
-  {
-    id: 5,
-    stallNumber: '15',
-    price: '1,800',
-    priceValue: 1800,
-    location: 'NCPM',
-    floor: 'Ground Floor / Electronics Section',
-    size: '4x3 meters',
-    status: 'available',
-    image: 'https://oldspitalfieldsmarket.com/cms/2017/10/OSM_FP_Stall_sq-1440x1440.jpg',
-  },
-  {
-    id: 6,
-    stallNumber: '19',
-    price: '2,600',
-    priceValue: 2600,
-    location: 'SATELLITE MARKET',
-    floor: '2nd Floor / Electronics Section',
-    size: '4x3 meters',
-    status: 'available',
-    image: 'https://oldspitalfieldsmarket.com/cms/2017/10/OSM_FP_Stall_sq-1440x1440.jpg',
-  },
-];
+const { width } = Dimensions.get('window');
 
 const StallScreen = () => {
   const [selectedFilter, setSelectedFilter] = useState('ALL');
   const [selectedSort, setSelectedSort] = useState('default');
   const [searchText, setSearchText] = useState('');
+  const [stallsData, setStallsData] = useState([]);
+  const [userApplications, setUserApplications] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(null); // Track which stall is being applied to
+
+  // Load user data and stalls on component mount
+  useEffect(() => {
+    loadUserDataAndStalls();
+  }, []);
+
+  const loadUserDataAndStalls = async () => {
+    try {
+      setLoading(true);
+      
+      // Get user data from storage
+      const userData = await UserStorageService.getUserData();
+      if (!userData || !userData.user) {
+        Alert.alert('Error', 'User not logged in. Please login again.');
+        return;
+      }
+      
+      setUserData(userData);
+      
+      // Get user applications from the new backend structure
+      const applications = userData.applications?.my_applications || [];
+      setUserApplications(applications);
+      
+      // Transform available stalls data to match the component format
+      if (userData.stalls?.available_stalls) {
+        const transformedStalls = userData.stalls.available_stalls.map(stall => ({
+          id: stall.stall_id,
+          stallNumber: stall.stall_no,
+          price: stall.rental_price ? stall.rental_price.toLocaleString() : '0',
+          priceValue: stall.rental_price || 0,
+          location: stall.branch_name || 'Unknown',
+          floor: `${stall.floor_name} / ${stall.section_name}`,
+          size: stall.size || 'Unknown',
+          status: getStallStatus(stall),
+          image: stall.stall_image || 'https://oldspitalfieldsmarket.com/cms/2017/10/OSM_FP_Stall_sq-1440x1440.jpg',
+          branchId: stall.branch_id,
+          priceType: stall.price_type,
+          stallLocation: stall.stall_location,
+          description: stall.description,
+          canApply: stall.can_apply,
+          applicationsInBranch: stall.applications_in_branch,
+          maxApplicationsReached: stall.max_applications_reached
+        }));
+        
+        setStallsData(transformedStalls);
+      }
+      
+    } catch (error) {
+      console.error('Error loading user data and stalls:', error);
+      Alert.alert('Error', 'Failed to load stall data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Determine stall status based on backend data
+  const getStallStatus = (stall) => {
+    // Check application status from backend
+    if (stall.application_status === 'applied') {
+      return 'applied';
+    }
+    
+    // Check if user can apply (based on backend logic)
+    if (!stall.can_apply) {
+      return 'locked';
+    }
+    
+    // Check stall type
+    switch (stall.price_type) {
+      case 'Raffle':
+        return 'raffle';
+      case 'Auction':
+        return 'auction';
+      case 'Fixed Price':
+        return 'available';
+      default:
+        return 'available';
+    }
+  };
+
+  // Handle stall application with improved backend integration
+  const handleApplyToStall = async (stall) => {
+    try {
+      if (!userData || !userData.user) {
+        Alert.alert('Error', 'User data not found. Please login again.');
+        return;
+      }
+
+      // Check if user can apply (based on backend data)
+      if (!stall.canApply) {
+        if (stall.maxApplicationsReached) {
+          Alert.alert(
+            'Application Limit Reached', 
+            `You have reached the maximum of 2 applications for ${stall.location}. You currently have ${stall.applicationsInBranch} applications in this branch.`
+          );
+        } else {
+          Alert.alert('Cannot Apply', 'You cannot apply to this stall at the moment.');
+        }
+        return;
+      }
+
+      // Check if already applied (redundant check, but good for safety)
+      if (stall.status === 'applied') {
+        Alert.alert('Already Applied', 'You have already applied to this stall.');
+        return;
+      }
+
+      // Confirm application
+      const stallTypeText = stall.priceType === 'Raffle' ? 'join the raffle for' : 
+                           stall.priceType === 'Auction' ? 'bid in the auction for' : 'apply for';
+      
+      Alert.alert(
+        'Confirm Application',
+        `Do you want to ${stallTypeText} Stall #${stall.stallNumber} at ${stall.location}?\n\nPrice: ₱${stall.price}\nLocation: ${stall.floor}\nSize: ${stall.size}\nType: ${stall.priceType}`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Confirm', 
+            onPress: () => submitApplication(stall)
+          }
+        ]
+      );
+
+    } catch (error) {
+      console.error('Error applying to stall:', error);
+      Alert.alert('Error', 'Failed to apply to stall. Please try again.');
+    }
+  };
+
+  // Submit application to backend using the new API
+  const submitApplication = async (stall) => {
+    try {
+      setApplying(stall.id);
+      
+      const response = await ApiService.submitApplication(userData.user.applicant_id, stall.id);
+      
+      if (response.success) {
+        // Update local data with the new application
+        const newApplication = {
+          application_id: response.data.application_id,
+          stall_id: stall.id,
+          applicant_id: userData.user.applicant_id,
+          application_date: new Date().toISOString().split('T')[0],
+          application_status: 'Pending',
+          branch_id: stall.branchId,
+          stall_no: stall.stallNumber,
+          branch_name: stall.location,
+          stall_location: stall.stallLocation,
+          size: stall.size,
+          rental_price: stall.priceValue,
+          price_type: stall.priceType,
+          description: stall.description,
+          floor_name: stall.floor.split(' / ')[0],
+          section_name: stall.floor.split(' / ')[1],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        // Update applications in storage
+        await UserStorageService.addApplication(newApplication);
+        
+        // Update local state
+        const updatedApplications = [...userApplications, newApplication];
+        setUserApplications(updatedApplications);
+        
+        // Update stall status and metadata
+        setStallsData(prevStalls => 
+          prevStalls.map(s => 
+            s.id === stall.id ? { 
+              ...s, 
+              status: 'applied',
+              canApply: false,
+              applicationsInBranch: s.applicationsInBranch + 1
+            } : s
+          )
+        );
+        
+        const successMessage = stall.priceType === 'Raffle' ? 'You have successfully joined the raffle!' :
+                              stall.priceType === 'Auction' ? 'You can now participate in the auction!' :
+                              'Your application has been submitted successfully!';
+        
+        Alert.alert('Success', successMessage);
+      } else {
+        Alert.alert('Error', response.message || 'Failed to submit application.');
+      }
+      
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      Alert.alert('Error', 'Failed to submit application. Please try again.');
+    } finally {
+      setApplying(null);
+    }
+  };
 
   const getFilteredAndSortedStalls = () => {
     let filtered = stallsData;
@@ -128,12 +264,32 @@ const StallScreen = () => {
           onSortSelect={setSelectedSort}
         />
 
-        {/* Stall Cards */}
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          {getFilteredAndSortedStalls().map((stall) => (
-            <StallCard key={stall.id} stall={stall} />
-          ))}
-        </ScrollView>
+        {/* Loading State */}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#002181" />
+            <Text style={styles.loadingText}>Loading stalls...</Text>
+          </View>
+        ) : (
+          /* Stall Cards */
+          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+            {getFilteredAndSortedStalls().length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No stalls available in your area</Text>
+                <Text style={styles.emptySubText}>Please check back later</Text>
+              </View>
+            ) : (
+              getFilteredAndSortedStalls().map((stall) => (
+                <StallCard 
+                  key={stall.id} 
+                  stall={stall} 
+                  onApply={handleApplyToStall}
+                  applying={applying === stall.id}
+                />
+              ))
+            )}
+          </ScrollView>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -143,6 +299,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#374151',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubText: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,

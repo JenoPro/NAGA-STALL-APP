@@ -1,35 +1,77 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 
-const StallCard = ({ stall }) => {
-  const getStatusButton = (status) => {
-    switch (status) {
-      case 'available':
+const StallCard = ({ stall, onApply, applying }) => {
+  const getStatusButton = (stall) => {
+    // If user cannot apply (based on backend logic)
+    if (!stall.canApply) {
+      if (stall.maxApplicationsReached) {
         return (
-          <TouchableOpacity style={[styles.statusButton, styles.availableButton]}>
-            <Text style={[styles.statusButtonText, styles.availableButtonText]}>APPLY NOW!</Text>
+          <TouchableOpacity style={[styles.statusButton, styles.limitReachedButton]} disabled>
+            <Text style={[styles.statusButtonText, styles.limitReachedButtonText]}>
+              LIMIT REACHED ({stall.applicationsInBranch}/2)
+            </Text>
           </TouchableOpacity>
         );
-      case 'locked':
-        return (
-          <TouchableOpacity style={[styles.statusButton, styles.lockedButton]} disabled>
-            <Text style={[styles.statusButtonText, styles.lockedButtonText]}>🔒 LOCK</Text>
-          </TouchableOpacity>
-        );
-      case 'raffle':
-        return (
-          <TouchableOpacity style={[styles.statusButton, styles.raffleButton]}>
-            <Text style={[styles.statusButtonText, styles.raffleButtonText]}>RAFFLE ONGOING</Text>
-          </TouchableOpacity>
-        );
-      case 'applied':
+      } else if (stall.status === 'applied') {
         return (
           <TouchableOpacity style={[styles.statusButton, styles.appliedButton]} disabled>
-            <Text style={[styles.statusButtonText, styles.appliedButtonText]}>ALREADY APPLY!</Text>
+            <Text style={[styles.statusButtonText, styles.appliedButtonText]}>ALREADY APPLIED!</Text>
+          </TouchableOpacity>
+        );
+      }
+    }
+
+    // Handle different price types and statuses
+    switch (stall.priceType) {
+      case 'Fixed Price':
+        return (
+          <TouchableOpacity 
+            style={[styles.statusButton, styles.availableButton]}
+            onPress={() => onApply && onApply(stall)}
+            disabled={applying || !stall.canApply}
+          >
+            {applying ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text style={[styles.statusButtonText, styles.availableButtonText]}>APPLY NOW!</Text>
+            )}
+          </TouchableOpacity>
+        );
+      case 'Raffle':
+        return (
+          <TouchableOpacity 
+            style={[styles.statusButton, styles.raffleButton]}
+            onPress={() => onApply && onApply(stall)}
+            disabled={applying || !stall.canApply}
+          >
+            {applying ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text style={[styles.statusButtonText, styles.raffleButtonText]}>JOIN RAFFLE</Text>
+            )}
+          </TouchableOpacity>
+        );
+      case 'Auction':
+        return (
+          <TouchableOpacity 
+            style={[styles.statusButton, styles.auctionButton]}
+            onPress={() => onApply && onApply(stall)}
+            disabled={applying || !stall.canApply}
+          >
+            {applying ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text style={[styles.statusButtonText, styles.auctionButtonText]}>JOIN AUCTION</Text>
+            )}
           </TouchableOpacity>
         );
       default:
-        return null;
+        return (
+          <TouchableOpacity style={[styles.statusButton, styles.lockedButton]} disabled>
+            <Text style={[styles.statusButtonText, styles.lockedButtonText]}>🔒 NOT AVAILABLE</Text>
+          </TouchableOpacity>
+        );
     }
   };
 
@@ -56,6 +98,9 @@ const StallCard = ({ stall }) => {
 
         <View style={styles.priceContainer}>
           <Text style={styles.priceText}>{stall.price} Php / Monthly</Text>
+          {stall.priceType && stall.priceType !== 'Fixed Price' && (
+            <Text style={styles.priceTypeText}>({stall.priceType})</Text>
+          )}
         </View>
 
         <View style={styles.detailsContainer}>
@@ -63,7 +108,13 @@ const StallCard = ({ stall }) => {
           <Text style={styles.sizeText}>{stall.size}</Text>
         </View>
 
-        {getStatusButton(stall.status)}
+        {stall.description && (
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.descriptionText}>{stall.description}</Text>
+          </View>
+        )}
+
+        {getStatusButton(stall)}
       </View>
     </View>
   );
@@ -163,6 +214,12 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     textAlign: 'right',
   },
+  priceTypeText: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'right',
+    fontStyle: 'italic',
+  },
   detailsContainer: {
     marginBottom: 15,
   },
@@ -175,6 +232,14 @@ const styles = StyleSheet.create({
   sizeText: {
     fontSize: 14,
     color: '#6B7280',
+  },
+  descriptionContainer: {
+    marginBottom: 10,
+  },
+  descriptionText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontStyle: 'italic',
   },
   statusButton: {
     paddingVertical: 12,
@@ -204,11 +269,24 @@ const styles = StyleSheet.create({
   raffleButtonText: {
     color: '#FFFFFF',
   },
+  auctionButton: {
+    backgroundColor: '#F59E0B',
+  },
+  auctionButtonText: {
+    color: '#FFFFFF',
+  },
   appliedButton: {
     backgroundColor: '#9CA3AF',
   },
   appliedButtonText: {
     color: '#FFFFFF',
+  },
+  limitReachedButton: {
+    backgroundColor: '#DC2626',
+  },
+  limitReachedButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
   },
 });
 

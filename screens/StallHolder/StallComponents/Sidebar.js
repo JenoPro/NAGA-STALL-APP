@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Image,
 } from "react-native";
 import { styles } from "./css/styles";
+import UserStorageService from "../../../services/UserStorageService";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,6 +22,23 @@ const Sidebar = ({
   activeMenuItem = "dashboard",
 }) => {
   const slideAnim = useRef(new Animated.Value(-width * 0.85)).current;
+  const [userData, setUserData] = useState(null);
+
+  // Load user data when component mounts
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const storedUserData = await UserStorageService.getUserData();
+        if (storedUserData && storedUserData.user) {
+          setUserData(storedUserData.user);
+        }
+      } catch (error) {
+        console.error('Error loading user data for sidebar:', error);
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   useEffect(() => {
     if (isVisible) {
@@ -37,6 +55,16 @@ const Sidebar = ({
       }).start();
     }
   }, [isVisible]);
+
+  // Helper function to get user initials
+  const getUserInitials = (fullName) => {
+    if (!fullName) return "U";
+    const names = fullName.split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+    return fullName[0].toUpperCase();
+  };
 
   // Professional icon components using SVG-like paths rendered as text
   const SettingsIcon = () => (
@@ -143,14 +171,18 @@ const Sidebar = ({
                 >
                   <View style={styles.profileImageContainer}>
                     <View style={styles.profileImage}>
-                      <Text style={styles.profileInitials}>JD</Text>
+                      <Text style={styles.profileInitials}>
+                        {userData ? getUserInitials(userData.full_name) : "U"}
+                      </Text>
                     </View>
                     <View style={styles.statusIndicator} />
                   </View>
                   <View style={styles.profileInfo}>
-                    <Text style={styles.profileName}>John Doe</Text>
+                    <Text style={styles.profileName}>
+                      {userData ? userData.full_name : "Loading..."}
+                    </Text>
                     <Text style={styles.profileEmail}>
-                      john.doe@example.com
+                      {userData ? (userData.email || userData.username) : ""}
                     </Text>
                     <Text style={styles.profileStatus}>Online</Text>
                   </View>
@@ -159,10 +191,11 @@ const Sidebar = ({
                 <TouchableOpacity
                   style={styles.addAccountButton}
                   onPress={() => {
-                    console.log("Add account pressed");
+                    console.log("View profile pressed");
+                    onProfilePress && onProfilePress();
                   }}
                 >
-                  <Text style={styles.plusIcon}>+</Text>
+                  <Text style={styles.plusIcon}>👤</Text>
                 </TouchableOpacity>
               </View>
             </View>

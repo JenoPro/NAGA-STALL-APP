@@ -15,6 +15,7 @@ import ThemeModal from "../Settings/components/ThemeComponents/ThemeModal";
 import { useTheme } from "../Settings/components/ThemeComponents/ThemeContext";
 import AboutApp from "../Settings/components/AboutComponents/AboutApp";
 import PrivacyModal from "../Settings/components/PrivacyComponents/PrivacyModal";
+import UserStorageService from "../../../../services/UserStorageService";
 
 const { width } = Dimensions.get("window");
 
@@ -23,16 +24,65 @@ const SettingsScreen = ({ user }) => {
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [userData, setUserData] = useState(null);
   const { theme, themeMode, changeTheme } = useTheme();
 
-  // fallback if no user is passed
-  const testUser = user || mockUser;
+  // Load user data from storage
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const storedUserData = await UserStorageService.getUserData();
+        if (storedUserData) {
+          setUserData(storedUserData);
+          console.log("Settings - Loaded user data:", storedUserData);
+        }
+      } catch (error) {
+        console.error('Settings - Error loading user data:', error);
+      }
+    };
+
+    loadUserData();
+  }, []);
+
+  // fallback if no user is passed - use real data if available, otherwise mock
+  const testUser = userData || user || mockUser;
 
   // logging (optional for debugging)
   useEffect(() => {
     console.log("User received:", user);
+    console.log("User data from storage:", userData);
     console.log("Using user:", testUser);
-  }, [user]);
+  }, [user, userData]);
+
+  // Helper function to get user initials
+  const getUserInitials = (name) => {
+    if (!name) return "GU";
+    return name
+      .split(" ")
+      .map(word => word.charAt(0))
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  // Get real user name from stored data
+  const getUserDisplayName = () => {
+    if (userData && userData.user && userData.user.full_name) {
+      return userData.user.full_name;
+    }
+    return testUser?.fullName || "Guest";
+  };
+
+  // Get user email/username for subtitle
+  const getUserSubtitle = () => {
+    if (userData && userData.user) {
+      const user = userData.user;
+      return user.email || user.username || "View and edit profile";
+    }
+    return testUser?.stallNumber
+      ? `Stall: ${testUser.stallNumber}`
+      : "View and edit profile";
+  };
 
   // Profile handlers
   const handleViewProfile = () => {
@@ -94,19 +144,17 @@ const SettingsScreen = ({ user }) => {
             onPress={handleViewProfile}
             style={themedStyles.profileRow}
           >
-            <Ionicons
-              name="person-circle-outline"
-              size={64}
-              color={theme.colors.primary}
-            />
+            <View style={themedStyles.avatarContainer}>
+              <Text style={themedStyles.avatarText}>
+                {getUserInitials(getUserDisplayName())}
+              </Text>
+            </View>
             <View style={themedStyles.profileInfo}>
               <Text style={themedStyles.profileName}>
-                {testUser?.fullName || "Guest"}
+                {getUserDisplayName()}
               </Text>
               <Text style={themedStyles.profileSubtitle}>
-                {testUser?.stallNumber
-                  ? `Stall: ${testUser.stallNumber}`
-                  : "View and edit profile"}
+                {getUserSubtitle()}
               </Text>
             </View>
             <Ionicons
@@ -254,6 +302,19 @@ const createThemedStyles = (theme) =>
       fontSize: width * 0.038,
       color: theme.colors.textSecondary,
       marginTop: 2,
+    },
+    avatarContainer: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: theme.colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    avatarText: {
+      fontSize: width * 0.045,
+      fontWeight: "bold",
+      color: "#fff",
     },
     section: {
       marginTop: 10,

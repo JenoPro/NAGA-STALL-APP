@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,27 +8,19 @@ import {
   Image,
   StatusBar,
   Modal,
-  FlatList,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import styles from './LogInCSS/LoginCSS';
 import {
-  loginOptions,
   handleLogin,
   handleForgotPassword,
-  toggleDropdown,
-  selectOption,
-  getSelectedLabel,
 } from './LoginFunction/LoginFunctions';
 
 const LoginScreen = ({ navigation }) => {
   // State management
-  const [loginAs, setLoginAs] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [isLoading, setIsLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({
     visible: false,
@@ -36,37 +28,19 @@ const LoginScreen = ({ navigation }) => {
     message: '',
     type: 'error' // 'error', 'info', 'success'
   });
-  const dropdownRef = useRef(null);
 
   // Wrapper functions to pass state setters to imported functions
   const handleLoginPress = () => {
-    handleLogin(loginAs, username, password, setIsLoading, navigation, setErrorModal);
+    handleLogin(username, password, setIsLoading, navigation, setErrorModal);
   };
 
   const handleForgotPasswordPress = () => {
     handleForgotPassword(setErrorModal);
   };
 
-  const handleToggleDropdown = () => {
-    toggleDropdown(dropdownRef, setDropdownPosition, setIsDropdownVisible, isDropdownVisible);
-  };
-
-  const handleSelectOption = (option) => {
-    selectOption(option, setLoginAs, setIsDropdownVisible);
-  };
-
   const closeErrorModal = () => {
     setErrorModal({ ...errorModal, visible: false });
   };
-
-  const renderDropdownItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.dropdownItem}
-      onPress={() => handleSelectOption(item)}
-    >
-      <Text style={styles.dropdownItemText}>{item.label}</Text>
-    </TouchableOpacity>
-  );
 
   const getModalIcon = () => {
     switch (errorModal.type) {
@@ -124,25 +98,6 @@ const LoginScreen = ({ navigation }) => {
               <Text style={styles.formTitle}>Sign In</Text>
 
               <View style={styles.inputContainer}>
-                <TouchableOpacity
-                  ref={dropdownRef}
-                  style={styles.dropdownContainer}
-                  onPress={handleToggleDropdown}
-                >
-                  <Text style={[
-                    styles.dropdownText,
-                    loginAs === '' && styles.placeholderText
-                  ]}>
-                    {getSelectedLabel(loginAs)}
-                  </Text>
-                  <View style={[
-                    styles.arrow,
-                    isDropdownVisible && styles.arrowUp
-                  ]} />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.textInput}
                   placeholder="Username"
@@ -186,38 +141,6 @@ const LoginScreen = ({ navigation }) => {
             </View>
           </SafeAreaView>
         </ImageBackground>
-
-        {/* Dropdown Modal */}
-        <Modal
-          visible={isDropdownVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setIsDropdownVisible(false)}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => setIsDropdownVisible(false)}
-          >
-            <View
-              style={[
-                styles.dropdownList,
-                {
-                  top: dropdownPosition.top,
-                  left: dropdownPosition.left,
-                  width: dropdownPosition.width,
-                }
-              ]}
-            >
-              <FlatList
-                data={loginOptions}
-                renderItem={renderDropdownItem}
-                keyExtractor={(item) => item.value}
-                showsVerticalScrollIndicator={false}
-              />
-            </View>
-          </TouchableOpacity>
-        </Modal>
 
         {/* Custom Error Modal */}
         <Modal
