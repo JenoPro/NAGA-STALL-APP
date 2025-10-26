@@ -1,14 +1,36 @@
 // API Service for mobile app backend integration
-import { API_CONFIG } from '../config/networkConfig';
+import { API_CONFIG, NetworkUtils } from '../config/networkConfig';
 
 class ApiService {
+  // Test basic connectivity before login
+  static async testConnectivity() {
+    try {
+      console.log('🔌 Testing network connectivity...');
+      const server = await NetworkUtils.getActiveServer();
+      return {
+        success: true,
+        server: server,
+        message: 'Connection successful'
+      };
+    } catch (error) {
+      console.error('❌ Connectivity test failed:', error.message);
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  }
+
   // Mobile login function using the improved backend
   static async mobileLogin(username, password) {
     try {
-      console.log('🔄 Attempting login to:', `${API_CONFIG.BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.LOGIN}`);
+      // First ensure we have a working server
+      const server = await NetworkUtils.getActiveServer();
+      
+      console.log('🔄 Attempting login to:', `${server}${API_CONFIG.MOBILE_ENDPOINTS.LOGIN}`);
       console.log('📱 Request data:', { username, password: '***' });
 
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.LOGIN}`, {
+      const response = await fetch(`${server}${API_CONFIG.MOBILE_ENDPOINTS.LOGIN}`, {
         method: 'POST',
         headers: API_CONFIG.HEADERS,
         body: JSON.stringify({
@@ -38,11 +60,12 @@ class ApiService {
       console.error('🔍 Error message:', error.message);
       
       // Check if it's a network connectivity issue
-      if (error.message === 'Network request failed') {
+      if (error.message === 'Network request failed' || error.message.includes('Unable to connect')) {
         console.error('🚨 Network connectivity issue detected');
-        console.error('🔧 Check: Backend server running on port 3001?');
-        console.error('🔧 Check: Same Wi-Fi network?');
-        console.error('🔧 Check: Firewall blocking connections?');
+        console.error('🔧 Will attempt server discovery on next try');
+        
+        // Reset server to force rediscovery
+        API_CONFIG.BASE_URL = null;
       }
       
       return {
@@ -55,7 +78,10 @@ class ApiService {
   // Submit application using the improved backend
   static async submitApplication(applicantId, stallId) {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.SUBMIT_APPLICATION}`, {
+      // Ensure we have a working server
+      const server = await NetworkUtils.getActiveServer();
+      
+      const response = await fetch(`${server}${API_CONFIG.MOBILE_ENDPOINTS.SUBMIT_APPLICATION}`, {
         method: 'POST',
         headers: API_CONFIG.HEADERS,
         body: JSON.stringify({
@@ -84,34 +110,148 @@ class ApiService {
     }
   }
 
-  // Health check with detailed connectivity testing
-  static async healthCheck() {
+  // Get stalls by type (Fixed Price, Raffle, Auction)
+  static async getStallsByType(type, applicantId) {
     try {
-      console.log('🏥 Testing connectivity to:', `${API_CONFIG.BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.HEALTH}`);
+      const server = await NetworkUtils.getActiveServer();
       
-      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.HEALTH}`, {
+      const url = `${server}/api/mobile/stalls/type/${encodeURIComponent(type)}${applicantId ? `?applicant_id=${applicantId}` : ''}`;
+      
+      console.log('🔄 Fetching stalls by type:', type);
+      console.log('📡 URL:', url);
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: API_CONFIG.HEADERS,
-        timeout: 10000, // 10 second timeout
       });
 
-      console.log('🏥 Health check response status:', response.status);
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Health check failed');
+        throw new Error(data.message || `Failed to fetch ${type} stalls`);
       }
 
-      console.log('✅ Backend is reachable:', data.message);
+      console.log(`✅ ${type} stalls fetched:`, data.data.total_count);
       return {
         success: true,
-        data: data,
+        data: data.data,
         message: data.message
       };
     } catch (error) {
-      console.error('❌ Health Check Error:', error);
-      console.error('🔍 Full URL tested:', `${API_CONFIG.BASE_URL}${API_CONFIG.MOBILE_ENDPOINTS.HEALTH}`);
+      console.error(`Get ${type} Stalls API Error:`, error);
+      return {
+        success: false,
+        message: error.message || 'Network error occurred',
+        data: { stalls: [], total_count: 0 }
+      };
+    }
+  }
+
+  // Get stalls by area
+  static async getStallsByArea(area, applicantId, type = null) {
+    try {
+      const server = await NetworkUtils.getActiveServer();
       
+      let url = `${server}/api/mobile/stalls/area/${encodeURIComponent(area)}?`;
+      if (applicantId) url += `applicant_id=${applicantId}&`;
+      if (type) url += `type=${encodeURIComponent(type)}&`;
+      
+      console.log('🔄 Fetching stalls by area:', area);
+      console.log('📡 URL:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: API_CONFIG.HEADERS,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Failed to fetch stalls in ${area}`);
+      }
+
+      console.log(`✅ Stalls in ${area} fetched:`, data.data.total_count);
+      return {
+        success: true,
+        data: data.data,
+        message: data.message
+      };
+    } catch (error) {
+      console.error(`Get Stalls by Area API Error:`, error);
+      return {
+        success: false,
+        message: error.message || 'Network error occurred',
+        data: { stalls: [], total_count: 0 }
+      };
+    }
+  }
+
+  // Get all stalls
+  static async getAllStalls(applicantId) {
+    try {
+      const server = await NetworkUtils.getActiveServer();
+      
+      const url = `${server}/api/mobile/stalls${applicantId ? `?applicant_id=${applicantId}` : ''}`;
+      
+      console.log('🔄 Fetching all stalls');
+      console.log('📡 URL:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: API_CONFIG.HEADERS,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch stalls');
+      }
+
+      console.log('✅ All stalls fetched:', data.data.total_count);
+      return {
+        success: true,
+        data: data.data,
+        message: data.message
+      };
+    } catch (error) {
+      console.error('Get All Stalls API Error:', error);
+      return {
+        success: false,
+        message: error.message || 'Network error occurred',
+        data: { all_stalls: [], total_count: 0 }
+      };
+    }
+  }
+
+  // Get stall by ID
+  static async getStallById(stallId, applicantId) {
+    try {
+      const server = await NetworkUtils.getActiveServer();
+      
+      const url = `${server}/api/mobile/stalls/${stallId}${applicantId ? `?applicant_id=${applicantId}` : ''}`;
+      
+      console.log('🔄 Fetching stall details:', stallId);
+      console.log('📡 URL:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: API_CONFIG.HEADERS,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch stall details');
+      }
+
+      console.log('✅ Stall details fetched:', data.data.stallNumber);
+      return {
+        success: true,
+        data: data.data,
+        message: data.message
+      };
+    } catch (error) {
+      console.error('Get Stall by ID API Error:', error);
       return {
         success: false,
         message: error.message || 'Network error occurred'
@@ -119,31 +259,46 @@ class ApiService {
     }
   }
 
-  // Test basic connectivity to server
-  static async testConnectivity() {
+  // Search stalls with filters
+  static async searchStalls(filters = {}) {
     try {
-      console.log('🔌 Testing basic connectivity to:', API_CONFIG.BASE_URL);
+      const server = await NetworkUtils.getActiveServer();
       
-      const response = await fetch(`${API_CONFIG.BASE_URL}/`, {
+      // Build query string
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) params.append(key, filters[key]);
+      });
+      
+      const url = `${server}/api/mobile/stalls/search?${params.toString()}`;
+      
+      console.log('🔄 Searching stalls with filters:', filters);
+      console.log('📡 URL:', url);
+
+      const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        },
-        timeout: 5000
+        headers: API_CONFIG.HEADERS,
       });
 
-      console.log('🔌 Basic connectivity test status:', response.status);
-      
-      if (response.ok) {
-        console.log('✅ Server is reachable');
-        return true;
-      } else {
-        console.log('⚠️ Server responded but with error status:', response.status);
-        return false;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to search stalls');
       }
+
+      console.log('✅ Search results:', data.data.total_count);
+      return {
+        success: true,
+        data: data.data,
+        message: data.message
+      };
     } catch (error) {
-      console.error('❌ Basic connectivity failed:', error.message);
-      return false;
+      console.error('Search Stalls API Error:', error);
+      return {
+        success: false,
+        message: error.message || 'Network error occurred',
+        data: { stalls: [], total_count: 0 }
+      };
     }
   }
 }

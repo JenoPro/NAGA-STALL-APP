@@ -37,14 +37,14 @@ export const handleLogin = async (username, password, setIsLoading, navigation, 
     console.log('✅ Basic connectivity successful');
 
     // Test health endpoint
-    console.log('🏥 Testing health endpoint...');
-    const healthResult = await ApiService.healthCheck();
+    console.log('📋 Login step 1: Testing basic connectivity...');
+    const connectivityResult = await ApiService.testConnectivity();
     
-    if (!healthResult.success) {
-      throw new Error('Server health check failed. Backend may not be properly configured.');
+    if (!connectivityResult.success) {
+      throw new Error(connectivityResult.message);
     }
 
-    console.log('✅ Health check successful');
+    console.log('✅ Connection successful to server:', connectivityResult.server);
 
     // Now attempt login
     console.log('🔐 Attempting login...');

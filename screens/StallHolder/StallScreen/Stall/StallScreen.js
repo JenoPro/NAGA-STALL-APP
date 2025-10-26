@@ -29,6 +29,7 @@ const StallScreen = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(null); // Track which stall is being applied to
+  const [availableFilters, setAvailableFilters] = useState(['ALL']); // Dynamic filters based on data
 
   // Load user data and stalls on component mount
   useEffect(() => {
@@ -52,28 +53,54 @@ const StallScreen = () => {
       const applications = userData.applications?.my_applications || [];
       setUserApplications(applications);
       
-      // Transform available stalls data to match the component format
-      if (userData.stalls?.available_stalls) {
-        const transformedStalls = userData.stalls.available_stalls.map(stall => ({
-          id: stall.stall_id,
-          stallNumber: stall.stall_no,
-          price: stall.rental_price ? stall.rental_price.toLocaleString() : '0',
-          priceValue: stall.rental_price || 0,
-          location: stall.branch_name || 'Unknown',
-          floor: `${stall.floor_name} / ${stall.section_name}`,
-          size: stall.size || 'Unknown',
-          status: getStallStatus(stall),
-          image: stall.stall_image || 'https://oldspitalfieldsmarket.com/cms/2017/10/OSM_FP_Stall_sq-1440x1440.jpg',
-          branchId: stall.branch_id,
-          priceType: stall.price_type,
-          stallLocation: stall.stall_location,
+      const applicantId = userData.user.applicant_id;
+      
+      // Fetch Fixed Price stalls from backend API
+      const response = await ApiService.getStallsByType('Fixed Price', applicantId);
+      
+      if (response.success && response.data.stalls && response.data.stalls.length > 0) {
+        const transformedStalls = response.data.stalls.map(stall => ({
+          id: stall.id,
+          stallNumber: stall.stallNumber,
+          price: stall.price,
+          priceValue: stall.priceValue,
+          location: stall.branch.name,
+          floor: stall.floorSection,
+          size: stall.size,
+          status: stall.isApplied ? 'applied' : (stall.canApply ? 'available' : 'locked'),
+          image: stall.image,
+          branchId: stall.branch.id,
+          priceType: stall.priceType,
+          stallLocation: stall.location,
           description: stall.description,
-          canApply: stall.can_apply,
-          applicationsInBranch: stall.applications_in_branch,
-          maxApplicationsReached: stall.max_applications_reached
+          canApply: stall.canApply,
+          applicationsInBranch: 0, // Will be calculated from applications
+          maxApplicationsReached: false
         }));
         
         setStallsData(transformedStalls);
+        
+        // Extract unique locations for filter
+        const uniqueLocations = [...new Set(transformedStalls.map(stall => stall.location))];
+        setAvailableFilters(['ALL', ...uniqueLocations]);
+        
+        // Show info message about area restriction
+        if (response.data.restriction_info) {
+          const areas = response.data.restriction_info.areas_with_access?.join(', ') || 'your applied areas';
+          console.log(`ℹ️ Showing stalls from: ${areas}`);
+        }
+      } else {
+        console.log('No Fixed Price stalls available:', response.message);
+        setStallsData([]);
+        
+        // Show informative message if no applications exist
+        if (response.data?.restriction_message) {
+          Alert.alert(
+            'No Stalls Available',
+            'You need to apply to your first stall to see more stalls in that area. Please check with your branch manager or admin to get started.',
+            [{ text: 'OK' }]
+          );
+        }
       }
       
     } catch (error) {
@@ -81,31 +108,6 @@ const StallScreen = () => {
       Alert.alert('Error', 'Failed to load stall data. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Determine stall status based on backend data
-  const getStallStatus = (stall) => {
-    // Check application status from backend
-    if (stall.application_status === 'applied') {
-      return 'applied';
-    }
-    
-    // Check if user can apply (based on backend logic)
-    if (!stall.can_apply) {
-      return 'locked';
-    }
-    
-    // Check stall type
-    switch (stall.price_type) {
-      case 'Raffle':
-        return 'raffle';
-      case 'Auction':
-        return 'auction';
-      case 'Fixed Price':
-        return 'available';
-      default:
-        return 'available';
     }
   };
 
@@ -262,6 +264,7 @@ const StallScreen = () => {
           onFilterSelect={setSelectedFilter}
           selectedSort={selectedSort}
           onSortSelect={setSelectedSort}
+          filters={availableFilters}
         />
 
         {/* Loading State */}
@@ -275,8 +278,11 @@ const StallScreen = () => {
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
             {getFilteredAndSortedStalls().length === 0 ? (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No stalls available in your area</Text>
-                <Text style={styles.emptySubText}>Please check back later</Text>
+                <Text style={styles.emptyText}>No stalls available</Text>
+                <Text style={styles.emptySubText}>
+                  Stalls are restricted to areas where you have applications. 
+                  Contact your branch manager to submit your first application.
+                </Text>
               </View>
             ) : (
               getFilteredAndSortedStalls().map((stall) => (

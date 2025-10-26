@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { ScrollView, StyleSheet, Dimensions, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Dimensions, Text, View, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "../Settings/components/ThemeComponents/ThemeContext";
@@ -7,84 +7,10 @@ import AuctionCard from "./Components/AuctionCardComponents/AuctionCard";
 import SearchFilterBar from "../Stall/components/SearchFilter/SearchFilterBar";
 import AuctionReminderModal from "../Auction/Components/AuctionReminderComponent/AuctionReminderModal";
 import { AuctionTimings } from "./Components/shared/constants";
+import UserStorageService from "../../../../services/UserStorageService";
+import ApiService from "../../../../services/ApiService";
 
 const { width } = Dimensions.get("window");
-
-// static satellite stalls data for auction
-const auctionStallsData = [
-  {
-    id: 2,
-    stallNumber: "50",
-    price: "2,100",
-    priceValue: 2100,
-    currentBid: 2400,
-    currentBidder: {
-      name: "Juan D.",
-      avatar: "👨‍💼",
-      location: "Manila",
-      bidTime: "2 minutes ago",
-      totalBids: 12,
-    },
-    location: "SATELLITE MARKET",
-    floor: "2nd Floor / Grocery Section",
-    size: "3x1 meters",
-    status: "available",
-    auctionDate: "September 27, 2025",
-    startTime: "1:10 PM",
-    image:
-      "https://i.pinimg.com/originals/b8/7f/96/b87f9661d0f56d6d88c8e1462e4c68a3.jpg",
-    stallDescription:
-      "Perfect for small businesses, this stall offers a clean and spacious layout ideal for boutiques, specialty shops, or service providers. With high customer visibility and easy access, it provides an excellent opportunity to showcase your products in a lively commercial environment.",
-  },
-  {
-    id: 4,
-    stallNumber: "32",
-    price: "2,500",
-    priceValue: 2500,
-    currentBid: 2800,
-    currentBidder: {
-      name: "Maria S.",
-      avatar: "👩‍💼",
-      location: "Quezon City",
-      bidTime: "5 minutes ago",
-      totalBids: 8,
-    },
-    location: "SATELLITE MARKET",
-    floor: "Ground Floor / Main Section",
-    size: "3x3 meters",
-    status: "available",
-    auctionDate: "September 28, 2025",
-    startTime: "2:00 PM",
-    image:
-      "https://cdn.broadsheet.com.au/sydney/images/2016/08/12/113402-542-cfe6bf07de43630928ce9225de88c1eb.jpg",
-    stallDescription:
-      "Designed for food entrepreneurs, this stall comes with a practical setup that can easily be customized for kiosks, snack bars, or takeaway counters. Its strategic location guarantees steady foot traffic, making it a great choice for startups or expanding food businesses.",
-  },
-  {
-    id: 6,
-    stallNumber: "19",
-    price: "2,600",
-    priceValue: 2600,
-    currentBid: 3100,
-    currentBidder: {
-      name: "Robert C.",
-      avatar: "👨‍🏭",
-      location: "Naga City",
-      bidTime: "1 minute ago",
-      totalBids: 15,
-    },
-    location: "SATELLITE MARKET",
-    floor: "2nd Floor / Electronics Section",
-    size: "4x3 meters",
-    status: "available",
-    auctionDate: "September 29, 2025",
-    startTime: "12:00 PM",
-    image:
-      "https://i.pinimg.com/originals/60/17/ec/6017ec3acc17f3e0d729d882026f92eb.jpg",
-    stallDescription:
-      "A versatile space suitable for retail, services, or office use. This stall offers a balance of affordability and accessibility, giving entrepreneurs the flexibility to adapt the space to their needs. Ideal for both new and established businesses looking to grow in a community-centered marketplace.",
-  },
-];
 
 const AuctionScreen = () => {
   const { theme } = useTheme();
@@ -92,14 +18,116 @@ const AuctionScreen = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("ALL");
   const [selectedSort, setSelectedSort] = useState("default");
+  const [auctionStallsData, setAuctionStallsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [availableFilters, setAvailableFilters] = useState(['ALL', 'PRE-REGISTERED']); // Dynamic filters
 
   const [preRegisteredStalls, setPreRegisteredStalls] = useState([]);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
+  // Load auction stalls on component mount
+  useEffect(() => {
+    loadAuctionStalls();
+  }, []);
+
+  const loadAuctionStalls = async () => {
+    try {
+      setLoading(true);
+      
+      // Get user data from storage
+      const userData = await UserStorageService.getUserData();
+      console.log('🔍 User Data:', userData ? 'Found' : 'Not Found');
+      
+      if (!userData || !userData.user) {
+        Alert.alert('Error', 'User not logged in. Please login again.');
+        setAuctionStallsData([]);
+        return;
+      }
+      
+      const applicantId = userData.user.applicant_id;
+      console.log('👤 Applicant ID:', applicantId);
+      
+      // Fetch auction stalls from backend API
+      console.log('🔄 Fetching auction stalls...');
+      const response = await ApiService.getStallsByType('Auction', applicantId);
+      
+      console.log('📦 API Response:', {
+        success: response.success,
+        totalCount: response.data?.total_count,
+        stallsLength: response.data?.stalls?.length,
+        message: response.message
+      });
+      
+      if (response.success && response.data.stalls && response.data.stalls.length > 0) {
+        console.log('✅ Found', response.data.stalls.length, 'auction stalls');
+        
+        const auctionStalls = response.data.stalls.map(stall => ({
+          id: stall.id,
+          stallNumber: stall.stallNumber,
+          price: stall.price,
+          priceValue: stall.priceValue,
+          currentBid: stall.currentBid || stall.priceValue,
+          currentBidder: stall.currentBidder || null,
+          location: stall.branch.name,
+          floor: stall.floorSection,
+          size: stall.size,
+          status: stall.canApply ? 'available' : (stall.isApplied ? 'applied' : 'unavailable'),
+          auctionDate: stall.auctionDate || "To be announced",
+          startTime: stall.startTime || "To be announced",
+          image: stall.image,
+          stallDescription: stall.description,
+          branchId: stall.branch.id,
+          priceType: stall.priceType,
+          stallLocation: stall.location,
+          canApply: stall.canApply,
+          isApplied: stall.isApplied
+        }));
+        
+        console.log('📝 Transformed stalls:', auctionStalls.length);
+        setAuctionStallsData(auctionStalls);
+        
+        // Extract unique locations for filter
+        const uniqueLocations = [...new Set(auctionStalls.map(stall => stall.location))];
+        setAvailableFilters(['ALL', 'PRE-REGISTERED', ...uniqueLocations]);
+        
+        // Show info message about area restriction
+        if (response.data.restriction_info) {
+          const areas = response.data.restriction_info.areas_with_access?.join(', ') || 'your applied areas';
+          console.log(`ℹ️ Showing auction stalls from: ${areas}`);
+        }
+      } else {
+        console.log('⚠️ No auction stalls available:', response.message);
+        setAuctionStallsData([]);
+        
+        // Show informative message if no applications exist
+        if (response.data?.restriction_message) {
+          console.log('📢 Showing restriction alert');
+          Alert.alert(
+            'No Auction Stalls Available',
+            'You need to apply to a stall first to see auction stalls in that area. Please go to the Stall tab to submit your first application.',
+            [{ text: 'OK' }]
+          );
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ Error loading auction stalls:', error);
+      Alert.alert('Error', 'Failed to load auction stalls. Please try again.');
+      setAuctionStallsData([]);
+    } finally {
+      console.log('🏁 Loading complete');
+      setLoading(false);
+    }
+  };
+
   const handlePreRegister = (stallId) => {
-    setPreRegisteredStalls((prev) =>
-      prev.includes(stallId) ? prev : [...prev, stallId]
-    );
+    console.log('🔔 Pre-registering stall:', stallId);
+    console.log('📋 Current pre-registered stalls:', preRegisteredStalls);
+    setPreRegisteredStalls((prev) => {
+      const updated = prev.includes(stallId) ? prev : [...prev, stallId];
+      console.log('✅ Updated pre-registered stalls:', updated);
+      return updated;
+    });
   };
 
   // Auto-refresh every 5 seconds to update auction status
@@ -111,8 +139,6 @@ const AuctionScreen = () => {
     return () => clearInterval(refreshInterval);
   }, []);
 
-  const auctionFilters = ["ALL", "PRE-REGISTERED"];
-
   const auctionSortOptions = [
     { label: "Price: Low to High", value: "price_asc" },
     { label: "Price: High to Low", value: "price_desc" },
@@ -122,6 +148,10 @@ const AuctionScreen = () => {
 
   // filter and sort logic
   const filteredAndSortedStalls = useMemo(() => {
+    console.log('🔍 Filter Logic - Selected Filter:', selectedFilter);
+    console.log('🔍 Pre-registered stalls:', preRegisteredStalls);
+    console.log('🔍 Total stalls:', auctionStallsData.length);
+    
     let filtered = [...auctionStallsData];
 
     // search filter
@@ -138,8 +168,17 @@ const AuctionScreen = () => {
 
     // status filter
     if (selectedFilter === "PRE-REGISTERED") {
-      filtered = filtered.filter((stall) =>
-        preRegisteredStalls.includes(stall.id)
+      console.log('🔍 Filtering for PRE-REGISTERED stalls...');
+      filtered = filtered.filter((stall) => {
+        const isIncluded = preRegisteredStalls.includes(stall.id);
+        console.log(`  Stall ${stall.id} (${stall.stallNumber}): ${isIncluded ? '✅ INCLUDED' : '❌ EXCLUDED'}`);
+        return isIncluded;
+      });
+      console.log('🔍 After PRE-REGISTERED filter:', filtered.length, 'stalls');
+    } else if (selectedFilter !== "ALL") {
+      // Filter by location/branch
+      filtered = filtered.filter((stall) => 
+        stall.location === selectedFilter
       );
     }
 
@@ -155,7 +194,7 @@ const AuctionScreen = () => {
     }
 
     return filtered;
-  }, [searchText, selectedFilter, selectedSort, preRegisteredStalls]);
+  }, [searchText, selectedFilter, selectedSort, preRegisteredStalls, auctionStallsData]);
 
   return (
     <SafeAreaProvider>
@@ -167,19 +206,26 @@ const AuctionScreen = () => {
           onClose={() => setShowReminder(false)}
         />
 
-        {/* Header */}
-        {!showReminder && (
+        {/* Loading State */}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading auction stalls...</Text>
+          </View>
+        ) : (
           <>
-            {/* Title Header */}
-            <SearchFilterBar
-              searchText={searchText}
-              onSearchChange={setSearchText}
-              selectedFilter={selectedFilter}
+            {/* Header */}
+            {!showReminder && (
+              <>
+                {/* Title Header */}
+                <SearchFilterBar
+                  searchText={searchText}
+                  onSearchChange={setSearchText}
+                  selectedFilter={selectedFilter}
               onFilterSelect={setSelectedFilter}
               selectedSort={selectedSort}
               onSortSelect={setSelectedSort}
               searchPlaceholder="Search stalls, floor, or status..."
-              filters={auctionFilters}
+              filters={availableFilters}
               sortOptions={auctionSortOptions}
             />
             {/* Results Header */}
@@ -236,6 +282,8 @@ const AuctionScreen = () => {
               )}
             </ScrollView>
           </>
+            )}
+          </>
         )}
       </SafeAreaView>
     </SafeAreaProvider>
@@ -245,6 +293,17 @@ const AuctionScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#6B7280',
   },
   titleHeader: {
     paddingHorizontal: width * 0.04,

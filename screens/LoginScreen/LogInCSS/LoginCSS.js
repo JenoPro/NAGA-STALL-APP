@@ -87,6 +87,14 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     marginBottom: 10,
+    position: 'relative',
+  },
+
+  passwordToggle: {
+    position: 'absolute',
+    right: 15,
+    top: 13,
+    zIndex: 1,
   },
 
   dropdownContainer: {

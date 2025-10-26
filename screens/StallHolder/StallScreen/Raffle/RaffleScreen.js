@@ -6,9 +6,12 @@ import {
   Dimensions,
   Text,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import RaffleCard from './Components/RaffleCard';
 import SearchFilterBar from './Components/SearchFilter/SearchFilterBar';
+import UserStorageService from '../../../../services/UserStorageService';
+import ApiService from '../../../../services/ApiService';
 
 const { width } = Dimensions.get('window');
 
@@ -19,60 +22,6 @@ const RaffleScreen = () => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  // Sample data - replace with your API call
-  const sampleRaffles = [
-    {
-      id: 1,
-      stall: '30',
-      location: '2nd Floor / Grocery Section\n3x3 meters',
-      image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400',
-      isLive: true,
-      endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-      category: 'grocery',
-      floor: 'floor2'
-    },
-    {
-      id: 2,
-      stall: '50',
-      location: '2nd Floor / Grocery Section\n3x3 meters',
-      image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
-      isLive: false,
-      endTime: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
-      category: 'grocery',
-      floor: 'floor2'
-    },
-    {
-      id: 3,
-      stall: '15',
-      location: '1st Floor / Electronics Section\n4x4 meters',
-      image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400',
-      isLive: true,
-      endTime: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(),
-      category: 'electronics',
-      floor: 'floor1'
-    },
-    {
-      id: 4,
-      stall: '25',
-      location: '1st Floor / Clothing Section\n3x2 meters',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400',
-      isLive: false,
-      endTime: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      category: 'clothing',
-      floor: 'floor1'
-    },
-    {
-      id: 5,
-      stall: '8',
-      location: '1st Floor / Food Court\n2x3 meters',
-      image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400',
-      isLive: false,
-      endTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
-      category: 'food',
-      floor: 'floor1'
-    },
-  ];
 
   useEffect(() => {
     loadRaffles();
@@ -85,10 +34,62 @@ const RaffleScreen = () => {
   const loadRaffles = async () => {
     try {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setRaffles(sampleRaffles);
+      
+      // Get user data from storage
+      const userData = await UserStorageService.getUserData();
+      if (!userData || !userData.user) {
+        Alert.alert('Error', 'User not logged in. Please login again.');
+        setRaffles([]);
+        return;
+      }
+      
+      const applicantId = userData.user.applicant_id;
+      
+      // Fetch raffle stalls from backend API
+      const response = await ApiService.getStallsByType('Raffle', applicantId);
+      
+      if (response.success && response.data.stalls && response.data.stalls.length > 0) {
+        const raffleStalls = response.data.stalls.map(stall => ({
+          id: stall.id,
+          stall: stall.stallNumber,
+          location: `${stall.floorSection}\n${stall.size}`,
+          image: stall.image,
+          isLive: true, // You can add logic here based on raffle start/end dates
+          endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // Default to 2 hours from now
+          category: stall.section?.toLowerCase() || 'general',
+          floor: stall.floor?.toLowerCase() || 'floor1',
+          price: stall.priceValue,
+          branchName: stall.branch.name,
+          description: stall.description,
+          canApply: stall.canApply,
+          isApplied: stall.isApplied
+        }));
+        
+        setRaffles(raffleStalls);
+        
+        // Show info message about area restriction
+        if (response.data.restriction_info) {
+          const areas = response.data.restriction_info.areas_with_access?.join(', ') || 'your applied areas';
+          console.log(`ℹ️ Showing raffle stalls from: ${areas}`);
+        }
+      } else {
+        console.log('No raffle stalls available:', response.message);
+        setRaffles([]);
+        
+        // Show informative message if no applications exist
+        if (response.data?.restriction_message) {
+          Alert.alert(
+            'No Raffle Stalls Available',
+            'You need to apply to a stall first to see raffle stalls in that area. Please go to the Stall tab to submit your first application.',
+            [{ text: 'OK' }]
+          );
+        }
+      }
+      
     } catch (error) {
       console.error('Error loading raffles:', error);
+      Alert.alert('Error', 'Failed to load raffle stalls. Please try again.');
+      setRaffles([]);
     } finally {
       setLoading(false);
     }
@@ -162,12 +163,12 @@ const RaffleScreen = () => {
     return (
       <View style={styles.emptyState}>
         <Text style={styles.emptyStateTitle}>
-          {hasFilters ? 'No raffles found' : 'No raffles available'}
+          {hasFilters ? 'No raffles found' : 'No raffle stalls available'}
         </Text>
         <Text style={styles.emptyStateText}>
           {hasFilters 
             ? 'Try adjusting your search or filters to find more results'
-            : 'Check back later for new raffles to join'
+            : 'Raffle stalls are only visible in areas where you have submitted applications. Submit your first application to see raffle stalls in that area.'
           }
         </Text>
       </View>

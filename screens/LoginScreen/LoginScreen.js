@@ -10,6 +10,7 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import styles from './LogInCSS/LoginCSS';
 import {
@@ -21,6 +22,7 @@ const LoginScreen = ({ navigation }) => {
   // State management
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorModal, setErrorModal] = useState({
     visible: false,
@@ -82,7 +84,7 @@ const LoginScreen = ({ navigation }) => {
           <SafeAreaView style={styles.content} edges={['bottom', 'left', 'right']}>
             <View style={styles.logoContainer}>
               <Image
-                source={require('../../assets/Login-Image/naga-city-logo.png')}
+                source={require('../../assets/Login-Image/DigiStall-Logo.png')}
                 style={styles.logo}
                 resizeMode="contain"
               />
@@ -115,9 +117,19 @@ const LoginScreen = ({ navigation }) => {
                   placeholderTextColor="#999"
                   value={password}
                   onChangeText={setPassword}
-                  secureTextEntry={true}
+                  secureTextEntry={!showPassword}
                   autoCapitalize="none"
                 />
+                <TouchableOpacity
+                  style={styles.passwordToggle}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off" : "eye"}
+                    size={24}
+                    color="#999"
+                  />
+                </TouchableOpacity>
               </View>
 
               <TouchableOpacity 
